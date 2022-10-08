@@ -20,7 +20,7 @@ exports.run = async(message, client, args) => {
         }
     }
 
-    if(isAllowed == false) {
+    if(!isAllowed) {
         return message.channel.send(client.embedMaker(message.author, "No Permission", "You don't have permission to run this command"));
     }
 
