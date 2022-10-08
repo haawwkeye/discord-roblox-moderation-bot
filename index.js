@@ -7,6 +7,8 @@ const app = express();
 
 require('dotenv').config();
 
+//TODO: Convert everything from discord.js 12 to discord.js 14
+
 const token = process.env.token;
 const prefix = process.env.prefix;
 const RBXToken = process.env.RBXToken;
