@@ -21,11 +21,11 @@ exports.run = async(message, client, args) => {
 
     let description = `There are ${client.commandList.length} commands\n\n`;
 
-    for(var i = 0; i < client.commandList.length; i++) {
+    for(const command of client.commandList) {
         let concatedString = "";
 
         try {
-            concatedString = await client.commandList[i].file.help();
+            concatedString = await command.file.help();
         } catch {
             concatedString = "**Load Failed** - Help display of command failed to load\n";
         }
