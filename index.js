@@ -60,7 +60,14 @@ const RBXToken = process.env.RBXToken;
 // That should be it for the todo comments I hope I might see what I can do later
 // God this took too long to type (I'm bad at spelling so hopefully no typos)
 
-client.embedMaker = function embedMaker(author, title, description) {
+/**
+ * 
+ * @param {Discord.User} author 
+ * @param {string} title 
+ * @param {string} description 
+ * @returns {Discord.MessageEmbed} embed
+ */
+client.embedMaker = (author, title, description) => {
     let embed = new Discord.MessageEmbed();
     embed.setColor(process.env.embedColor);
     embed.setAuthor(author.tag, author.displayAvatarURL());
@@ -121,7 +128,8 @@ async function readCommandFiles() {
     for(const file of files) {
         if(!file.endsWith(".js")) // Skip file as it isn't a vaild comamnd
         {
-            console.warn((`Invalid file detected in commands folder, please remove this file for the bot to work: ${file}`));
+            if (file.endsWith(".disabled")) continue; // most likely an disabled command so let's not warn
+            console.warn((`Invalid file detected in commands folder, please move this file: ${file}`));
             continue;
         } 
         let coreFile = require(`./commands/${file}`);
