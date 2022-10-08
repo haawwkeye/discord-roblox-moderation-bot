@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('then-fs');
+const path = require("path");
 
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 
@@ -35,6 +36,8 @@ const client = new Client({
 });
 
 const app = express();
+
+require(path.join(__dirname, "Web", "server.js"))(app);
 
 require('dotenv').config();
 
