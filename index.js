@@ -46,12 +46,16 @@ const RBXToken = process.env.RBXToken;
 //      The most I could do is make an mySQL database with an account list with permission levels
 //      and make it so only an admin account can create/remove accounts from the mySQL database (even tho I just learnt how to make an database locally)
 
+//TODO: (This will help with permission system) Spilt some stuff from .env into settings.json
+//      Stuff like cooldown, allowedRanks, etc will be in settings.json while stuff like the token would be in .env
+
 //TL;DR
 //TODO: Use Open Cloud API for commands instead of using /get-request
 //TODO: Permission level system to stop lower ranks from using certain commands instead of giving all ranks full access
 //TODO: Convert commands to be slash commands (I will probably keep message commands maybe)
 //TODO: Check to see if dotenv needs to be used in EVERY script instead of just in index
 //TODO: (optional) Make a website that does the same thing the bot does but in web form ig
+//TODO: make a settings.json file this should help with permission system since we can put everything but the tokens in there
 
 // That should be it for the todo comments I hope I might see what I can do later
 // God this took too long to type (I'm bad at spelling so hopefully no typos)
