@@ -11,7 +11,8 @@
     "then-fs": "^2.0.0"
   },
   "scripts": {
-    "start": "node index"
+    "start": "node index",
+    "debug": "./node index"
   },
   "author": "zachariapopcorn#8105",
   "license": "ISC"
