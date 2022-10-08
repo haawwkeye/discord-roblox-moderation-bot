@@ -37,7 +37,7 @@ const client = new Client({
 
 const app = express();
 
-require(path.join(__dirname, "Web", "server.js"))(app);
+require("./Web/server")(app);
 
 require('dotenv').config();
 
