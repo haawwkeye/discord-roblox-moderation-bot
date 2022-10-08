@@ -1,8 +1,39 @@
 const express = require('express');
-const Discord = require('discord.js');
 const fs = require('then-fs');
 
-const client = new Discord.Client();
+const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
+
+const client = new Client({
+    // We don't need everything but might aswell for development purposes
+    intents: [
+        GatewayIntentBits.DirectMessageReactions,
+        GatewayIntentBits.DirectMessageTyping,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.GuildBans,
+        GatewayIntentBits.GuildEmojisAndStickers,
+        GatewayIntentBits.GuildIntegrations,
+        GatewayIntentBits.GuildInvites,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildMessageTyping,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildScheduledEvents,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildWebhooks,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.MessageContent
+    ],
+    ws: {
+        // Makes the bot popup as using phone
+        properties: {
+            $os: process ? process.platform : 'discord.js',
+            $browser: 'Discord iOS',
+            $device: 'discord.js',
+      },
+    }
+});
+
 const app = express();
 
 require('dotenv').config();
@@ -12,6 +43,8 @@ require('dotenv').config();
 const token = process.env.token;
 const prefix = process.env.prefix;
 const RBXToken = process.env.RBXToken;
+
+// const rest = new REST({ version: '10' }).setToken(token); // Maybe we can move this and make a script instead?
 
 //TODO: Use Roblox API instead of get requests that way we can send more then one command every 5 seconds
 //      This would also allow us to verify without using client.request or we can make client.request and request table
