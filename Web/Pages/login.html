@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,minimum-scale=1">
+        <title>Admin Login</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+        <link rel="stylesheet" href="/css/login.css">
+    </head>
+    <body>
+        <div class="login">
+            <h1>Admin Panel Login</h1>
+            <form action="/api/auth" method="post">
+                <label for="username">
+                    <em class="fas fa-user"></em>
+                </label>
+                <input type="text" name="username" placeholder="Username" id="username" required>
+
+                <label for="password">
+                    <em class="fas fa-lock"></em>
+                </label>
+                <input type="text" name="password" placeholder="Password" id="password" required>
+
+                <input type="submit" value="Login">
+            </form>
+        </div>
+    </body>
+</html>
