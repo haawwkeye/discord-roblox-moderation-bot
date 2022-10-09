@@ -3,7 +3,6 @@ const mysql = require("mysql");
 const bcrypt = require("bcrypt");
 const express = require("express"); // Yea idk it's just how it works ig /shrug
 const path = require("path");
-const { userInfo } = require("os");
 
 /**
  * @param {express.Application} app
@@ -41,8 +40,7 @@ module.exports = (app) => {
     let userInfo = {
         permissionLevel: -1, //TODO: When Permission level system is done change this to be something else
         username: process.env.localUsername,
-        password: process.env.localPassword,
-        isHashed: hashed
+        password: process.env.localPassword
     }
 
     if (dbEnabled)
@@ -70,20 +68,22 @@ module.exports = (app) => {
     app.use(express.urlencoded({ extended: true }));
 
     app.get("/admin", (req, res) => {
-        if (req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html")); else res.redirect("/login");
-        // res.send("Hello, World")
+        if (req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html"));
+        else res.redirect("/login");
     });
 
     app.get("/login", (req, res) => {
-        if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"))
+        if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"));
         else res.redirect("/admin");
     });
 
     // This is going to be used later on when we do the admin panel code
     app.get("/api/isAdmin", (req, res) => {
-        res.send(req.session.isAdmin || false);
+        if (req.session.LoggedIn) res.send(req.session.isAdmin || false);
+        else res.status(403).send("You must be signed in to access this.")
     })
 
+    // Account Creation
     app.post("/api/editUser", (req, res) => {
         let username  = req.body.username;
         let password  = req.body.password;
@@ -96,31 +96,37 @@ module.exports = (app) => {
         else
         {
             //TODO: Make an account with info provided
-            connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
-                if (error) throw error;
+            try {
+                connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
+                    if (error) throw error;
 
-                if (results.length > 0)
-                {
-                    res.send("An account with that username already exists");
-                }
-                else
-                {
-                    let pass = password;
-
-                    if (hashed)
+                    if (results.length > 0)
                     {
-                        pass = bcrypt.hashSync(password, 10);
+                        res.send("An account with that username already exists");
                     }
+                    else
+                    {
+                        let pass = password;
 
-                    connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
-                        if (error) throw error;
-                        console.log(results);
-                    });
-                }
-            });
+                        if (hashed)
+                        {
+                            pass = bcrypt.hashSync(password, 10);
+                        }
+
+                        connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
+                            if (error) throw error;
+                            console.log(results);
+                        });
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+                res.status(500).send("Database Error\nPlease try again later.");
+            }
         }
     })
 
+    //Account Deletion
     app.delete("/api/editUser", (req, res) => {
         let username = req.body.username;
 
@@ -136,16 +142,23 @@ module.exports = (app) => {
             }
             else
             {
-                connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
-                    // If there is an issue with the query, output the error
-                    if (error) throw error;
-                    // If the account exists
-                    console.log(results);
-                })
+                try {
+                    connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
+                        // If there is an issue with the query, output the error
+                        if (error) throw error;
+                        // If the account exists
+                        console.log(results);
+                    });
+                } catch (err) {
+                    console.error(err);
+                    res.status(500).send("Database Error\nPlease try again later.");
+                }
             }
         }
     })
 
+    // Login system
+    //TODO: Learn how to send a user back to login on fail with a popup saying what went wrong
     app.post("/api/auth", (req, res) => {
         let username = req.body.username;
         let password = req.body.password;
@@ -163,7 +176,6 @@ module.exports = (app) => {
 
         if (connection != null)
         {
-            //TODO: mysql account system (this is PAIN since I'm very new to mysql databases)
             try {
                 connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
                     // If there is an issue with the query, output the error
@@ -184,7 +196,7 @@ module.exports = (app) => {
                             req.session.LoggedIn = true;
                             req.session.Username = username;
                             req.session.PermissionLevel = -1;
-                            req.session.IsAdmin = (user.isAdmin === 1);
+                            req.session.IsAdmin = (user.isAdmin === 1); // bool doesn't work in mysql? so it's an int instead
 
                             res.redirect("/admin");
                             return;
@@ -205,7 +217,7 @@ module.exports = (app) => {
                 let isVaildUser = (username === userInfo.username);
                 let isVaildPass = (password === userInfo.password);
 
-                if (userInfo.isHashed)
+                if (hashed)
                 {
                     isVaildPass = bcrypt.compareSync(password, userInfo.password);
                 }
@@ -223,6 +235,6 @@ module.exports = (app) => {
                 res.send("Setup Error: username or password is missing in .env");
             }
         }
-        res.send("Incorrect Username or Password")
+        res.send("Incorrect Username or Password");
     });
 }
