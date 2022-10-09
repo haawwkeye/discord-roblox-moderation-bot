@@ -5,29 +5,21 @@ const express = require("express"); // Yea idk it's just how it works ig /shrug
 const path = require("path");
 
 /**
+ * 
+ * @param {String} str
+ * @returns {Boolean} bool
+ */
+function convertToBool(str)
+{
+    return (str.toLowerCase() === "true") ? true : false;
+}
+
+/**
  * @param {express.Application} app
  */
 module.exports = (app) => {
-    let dbEnabled, hashed
-    if (process.env.dbEnabled != null)
-    {
-        dbEnabled = process.env.dbEnabled.toLowerCase();
-        if (dbEnabled === "true") dbEnabled = true; else dbEnabled = false;
-    }
-    else
-    {
-        dbEnabled = false;
-    }
-
-    if (process.env.hashed != null)
-    {
-        hashed = process.env.hashed.toLowerCase();
-        if (hashed === "true") hashed = true; else hashed = false;
-    }
-    else
-    {
-        hashed = false;
-    }
+    let dbEnabled = convertToBool(process.env.dbEnabled);
+    let hashed    = convertToBool(process.env.hashed);
 
     // console.log(process.env)
 
