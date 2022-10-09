@@ -68,10 +68,38 @@ module.exports = (app) => {
         if (req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html")); else res.redirect("/login");
         // res.send("Hello, World")
     });
+
     app.get("/login", (req, res) => {
         if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"))
         else res.redirect("/admin");
+    });
+
+    app.post("/api/editUser", (req, res) => {
+        let username  = req.body.username;
+        let password  = req.body.password;
+        let giveAdmin = req.body.isAdmin || false;
+
+        let isAdmin   = (req.session.LoggedIn && req.session.IsAdmin);
+        
+        if (isAdmin) res.sendStatus(403);
+        else
+        {
+            //TODO: Make an account with info provided
+        }
     })
+
+    app.delete("/api/editUser", (req, res) => {
+        let username = req.body.username;
+
+        let isAdmin  = (req.session.LoggedIn && req.session.IsAdmin);
+        
+        if (isAdmin) res.sendStatus(403);
+        else
+        {
+            //TODO: Delete an account with info provided
+        }
+    })
+
     app.post("/api/auth", (req, res) => {
         let username = req.body.username;
         let password = req.body.password;
@@ -90,28 +118,62 @@ module.exports = (app) => {
         if (connection != null)
         {
             //TODO: mysql account system (this is PAIN since I'm very new to mysql databases)
+            try {
+                connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
+                    // If there is an issue with the query, output the error
+                    if (error) throw error;
+                    // If the account exists
+                    if (results.length > 0) {
+                        let user = results[0];
+                        
+                        let isVaildPass = (password === user.password);
+
+                        if (userInfo.isHashed)
+                        {
+                            isVaildPass = bcrypt.compareSync(password, user.password);
+                        }
+
+                        if (isVaildPass)
+                        {
+                            req.session.LoggedIn = true;
+                            req.session.Username = true;
+                            req.session.IsAdmin = (user.isAdmin === 1);
+
+                            res.redirect("/admin");
+                            return;
+                        }
+                    }
+                    res.send("Incorrect Username or Password")
+                });
+            } catch (err) {
+                console.error(err);
+                res.status(500).send("Database Error\nPlease try again later.");
+            }
         }
         else
         {
             // Yes I know this is REALLY bad but like I'm lazy and I'm bad at doing this stuff
             if (userInfo.username && userInfo.password)
             {
-                let isVaildUser = username === userInfo.username
+                let isVaildUser = (username === userInfo.username);
                 let isVaildPass = (password === userInfo.password);
+
                 if (userInfo.isHashed)
                 {
-                    isVaildPass = bcrypt.compareSync(password, userInfo.password)
+                    isVaildPass = bcrypt.compareSync(password, userInfo.password);
                 }
 
-                req.session.LoggedIn = (isVaildUser && isVaildPass)
+                req.session.LoggedIn = (isVaildUser && isVaildPass);
+                req.session.IsAdmin = false;
 
-                res.redirect("/admin")
+                res.redirect("/admin");
+                return;
             }
             else
             {
-                res.send("Setup Error: username or password is missing in .env")
+                res.send("Setup Error: username or password is missing in .env");
             }
         }
         res.send("Incorrect Username or Password")
-    })
+    });
 }
