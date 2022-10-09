@@ -69,6 +69,7 @@ module.exports = (app) => {
         }
         else
         {
+            // Yes I know this is REALLY bad but like I'm lazy and I'm bad at doing this stuff
             if (userInfo.username && userInfo.password)
             {
                 let isVaildUser = username === userInfo.username
