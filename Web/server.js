@@ -9,14 +9,38 @@ const { userInfo } = require("os");
  * @param {express.Application} app
  */
 module.exports = (app) => {
+    let dbEnabled, hashed
+    if (process.env.dbEnabled != null)
+    {
+        dbEnabled = process.env.dbEnabled.toLowerCase();
+        if (dbEnabled === "true") dbEnabled = true; else dbEnabled = false;
+    }
+    else
+    {
+        dbEnabled = false;
+    }
+
+    if (process.env.hashed != null)
+    {
+        hashed = process.env.hashed.toLowerCase();
+        if (hashed === "true") hashed = true; else hashed = false;
+    }
+    else
+    {
+        hashed = false;
+    }
+
+    // console.log(process.env)
+
     // Required for auth unless you want to do one manually without a database
     let connection = null;
     let userInfo = {
-        username: process.env.username,
-        password: process.env.password,
-        isHashed: process.env.hashed
+        username: process.env.localUsername,
+        password: process.env.localPassword,
+        isHashed: hashed
     }
-    if (process.env.dbEnabled)
+
+    if (dbEnabled)
     {
         userInfo = null; // Not needed if using db since the user will most likely be defined in there
         connection = mysql.createConnection({
@@ -41,14 +65,14 @@ module.exports = (app) => {
     app.use(express.urlencoded({ extended: true }));
 
     app.get("/admin", (req, res) => {
-        if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html"))
+        if (req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html")); else res.redirect("/login");
         // res.send("Hello, World")
     });
     app.get("/login", (req, res) => {
         if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"))
         else res.redirect("/admin");
     })
-    app.post("/api/auth", async (req, res) => {
+    app.post("/api/auth", (req, res) => {
         let username = req.body.username;
         let password = req.body.password;
 
@@ -59,7 +83,7 @@ module.exports = (app) => {
         }
         if (!username || !password)
         {
-            res.send("Please enter a vaild username and password");
+            res.send("Please enter a vaild Username and Password");
             return;
         }
 
@@ -74,13 +98,20 @@ module.exports = (app) => {
             {
                 let isVaildUser = username === userInfo.username
                 let isVaildPass = (password === userInfo.password);
-                if (userInfo.hashed)
+                if (userInfo.isHashed)
                 {
-                    isVaildPass = await bcrypt.compare(password, userInfo.password)
+                    isVaildPass = bcrypt.compareSync(password, userInfo.password)
                 }
 
                 req.session.LoggedIn = (isVaildUser && isVaildPass)
+
+                res.redirect("/admin")
+            }
+            else
+            {
+                res.send("Setup Error: username or password is missing in .env")
             }
         }
+        res.send("Incorrect Username or Password")
     })
 }
