@@ -34,7 +34,12 @@ module.exports = (app) => {
 
     // Required for auth unless you want to do one manually without a database
     let connection = null;
+
+    //TODO: Make a list of users instead of just using one user
+    //      Maybe we can add this in settings.json when that's done??
+
     let userInfo = {
+        permissionLevel: -1, //TODO: When Permission level system is done change this to be something else
         username: process.env.localUsername,
         password: process.env.localPassword,
         isHashed: hashed
@@ -74,17 +79,45 @@ module.exports = (app) => {
         else res.redirect("/admin");
     });
 
+    // This is going to be used later on when we do the admin panel code
+    app.get("/api/isAdmin", (req, res) => {
+        res.send(req.session.isAdmin || false);
+    })
+
     app.post("/api/editUser", (req, res) => {
         let username  = req.body.username;
         let password  = req.body.password;
-        let giveAdmin = req.body.isAdmin || false;
+        let giveAdmin = req.body.isAdmin || 0;
+        let perms     = req.body.perms || 0;
 
         let isAdmin   = (req.session.LoggedIn && req.session.IsAdmin);
         
-        if (isAdmin) res.sendStatus(403);
+        if (!isAdmin) res.sendStatus(403);
         else
         {
             //TODO: Make an account with info provided
+            connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
+                if (error) throw error;
+
+                if (results.length > 0)
+                {
+                    res.send("An account with that username already exists");
+                }
+                else
+                {
+                    let pass = password;
+
+                    if (hashed)
+                    {
+                        pass = bcrypt.hashSync(password, 10);
+                    }
+
+                    connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
+                        if (error) throw error;
+                        console.log(results);
+                    });
+                }
+            });
         }
     })
 
@@ -93,10 +126,23 @@ module.exports = (app) => {
 
         let isAdmin  = (req.session.LoggedIn && req.session.IsAdmin);
         
-        if (isAdmin) res.sendStatus(403);
+        if (!isAdmin) res.sendStatus(403);
         else
         {
             //TODO: Delete an account with info provided
+            if (req.session.Username == username)
+            {
+                res.status(403).send(`Cannot remove self from database.\nPlease do this manually by going into the mysql console and using the following command:\nDELETE FROM Users WHERE username = ${username}`);
+            }
+            else
+            {
+                connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
+                    // If there is an issue with the query, output the error
+                    if (error) throw error;
+                    // If the account exists
+                    console.log(results);
+                })
+            }
         }
     })
 
@@ -128,7 +174,7 @@ module.exports = (app) => {
                         
                         let isVaildPass = (password === user.password);
 
-                        if (userInfo.isHashed)
+                        if (hashed)
                         {
                             isVaildPass = bcrypt.compareSync(password, user.password);
                         }
@@ -136,7 +182,8 @@ module.exports = (app) => {
                         if (isVaildPass)
                         {
                             req.session.LoggedIn = true;
-                            req.session.Username = true;
+                            req.session.Username = username;
+                            req.session.PermissionLevel = -1;
                             req.session.IsAdmin = (user.isAdmin === 1);
 
                             res.redirect("/admin");
@@ -164,6 +211,8 @@ module.exports = (app) => {
                 }
 
                 req.session.LoggedIn = (isVaildUser && isVaildPass);
+                req.session.Username = username;
+                req.session.PermissionLevel = userInfo.permissionLevel;
                 req.session.IsAdmin = false;
 
                 res.redirect("/admin");
