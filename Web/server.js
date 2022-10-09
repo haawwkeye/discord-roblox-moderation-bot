@@ -106,8 +106,11 @@ module.exports = (app) => {
                         }
 
                         connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
+                            // If there is an issue with the query, output the error
                             if (error) throw error;
+                            
                             console.log(results);
+                            res.send(`Successfully added user: ${username}`);
                         });
                     }
                 });
@@ -138,8 +141,9 @@ module.exports = (app) => {
                     connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
                         // If there is an issue with the query, output the error
                         if (error) throw error;
-                        // If the account exists
                         console.log(results);
+
+                        res.send(`Successfully deleted user: ${username}`);
                     });
                 } catch (err) {
                     console.error(err);
