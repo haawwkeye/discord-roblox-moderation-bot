@@ -35,9 +35,8 @@ const client = new Client({
     }
 });
 
+const server = require("./Web/server");
 const app = express();
-
-require("./Web/server")(app);
 
 require('dotenv').config();
 
@@ -157,6 +156,7 @@ app.post(`/verify-request`, async (request, response) => {
 });
 
 let listener = app.listen(process.env.PORT, () => {
+    server(app);
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
@@ -196,4 +196,4 @@ client.on("message", async message => {
     commandList[index].file.run(message, client, args);
 });
 
-client.login(token);
+// client.login(token);
