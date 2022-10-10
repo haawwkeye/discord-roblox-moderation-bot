@@ -84,7 +84,7 @@ module.exports = (app) => {
 
         let isAdmin   = (req.session.LoggedIn && req.session.IsAdmin);
         
-        if (!isAdmin) res.sendStatus(403);
+        if (!isAdmin || !dbEnabled) res.sendStatus(403);
         else
         {
             //TODO: Make an account with info provided
@@ -134,7 +134,7 @@ module.exports = (app) => {
 
         let isAdmin  = (req.session.LoggedIn && req.session.IsAdmin);
         
-        if (!isAdmin) res.sendStatus(403);
+        if (!isAdmin || !dbEnabled) res.sendStatus(403);
         else
         {
             //TODO: Delete an account with info provided
