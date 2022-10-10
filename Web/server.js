@@ -88,36 +88,43 @@ module.exports = (app) => {
         else
         {
             //TODO: Make an account with info provided
-            try {
-                connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
-                    if (error) throw error;
+            connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
+                // If there is an issue with the query, output the error
+                if (error)
+                {
+                    console.error(error);
+                    res.status(500).send("Database Error<br>Please try again later.");
+                    return;
+                }
 
-                    if (results.length > 0)
+                // If the account exists
+                if (results.length > 0)
+                {
+                    res.send("An account with that username already exists");
+                }
+                else
+                {
+                    let pass = password;
+
+                    if (hashed)
                     {
-                        res.send("An account with that username already exists");
+                        pass = bcrypt.hashSync(password, 10);
                     }
-                    else
-                    {
-                        let pass = password;
 
-                        if (hashed)
+                    connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
+                        // If there is an issue with the query, output the error
+                        if (error)
                         {
-                            pass = bcrypt.hashSync(password, 10);
+                            console.error(error);
+                            res.status(500).send("Database Error<br>Please try again later.");
+                            return;
                         }
-
-                        connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
-                            // If there is an issue with the query, output the error
-                            if (error) throw error;
-                            
-                            console.log(results);
-                            res.send(`Successfully added user: ${username}`);
-                        });
-                    }
-                });
-            } catch (err) {
-                console.error(err);
-                res.status(500).send("Database Error\nPlease try again later.");
-            }
+                        
+                        console.log(results);
+                        res.send(`Successfully added user: ${username}`);
+                    });
+                }
+            });
         }
     })
 
@@ -137,18 +144,19 @@ module.exports = (app) => {
             }
             else
             {
-                try {
-                    connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
-                        // If there is an issue with the query, output the error
-                        if (error) throw error;
-                        console.log(results);
+                connection.query('DELETE FROM Users WHERE username = ?', [username], (error, results, fields) => {
+                    // If there is an issue with the query, output the error
+                    if (error)
+                    {
+                        console.error(error);
+                        res.status(500).send("Database Error<br>Please try again later.");
+                        return;
+                    }
 
-                        res.send(`Successfully deleted user: ${username}`);
-                    });
-                } catch (err) {
-                    console.error(err);
-                    res.status(500).send("Database Error\nPlease try again later.");
-                }
+                    console.log(results);
+
+                    res.send(`Successfully deleted user: ${username}`);
+                });
             }
         }
     })
@@ -172,38 +180,37 @@ module.exports = (app) => {
 
         if (connection != null)
         {
-            try {
-                connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
-                    // If there is an issue with the query, output the error
-                    if (error) throw error;
-                    // If the account exists
-                    if (results.length > 0) {
-                        let user = results[0];
-                        
-                        let isVaildPass = (password === user.password);
+            connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
+                // If there is an issue with the query, output the error
+                if (error) {
+                    console.error(error);
+                    res.status(500).send("Database Error<br>Please try again later.");
+                    return;
+                }
+                // If the account exists
+                if (results.length > 0) {
+                    let user = results[0];
+                    
+                    let isVaildPass = (password === user.password);
 
-                        if (hashed)
-                        {
-                            isVaildPass = bcrypt.compareSync(password, user.password);
-                        }
-
-                        if (isVaildPass)
-                        {
-                            req.session.LoggedIn = true;
-                            req.session.Username = username;
-                            req.session.PermissionLevel = -1;
-                            req.session.IsAdmin = (user.isAdmin === 1); // bool doesn't work in mysql? so it's an int instead
-
-                            res.redirect("/admin");
-                            return;
-                        }
+                    if (hashed)
+                    {
+                        isVaildPass = bcrypt.compareSync(password, user.password);
                     }
-                    res.send("Incorrect Username or Password")
-                });
-            } catch (err) {
-                console.error(err);
-                res.status(500).send("Database Error\nPlease try again later.");
-            }
+
+                    if (isVaildPass)
+                    {
+                        req.session.LoggedIn = true;
+                        req.session.Username = username;
+                        req.session.PermissionLevel = -1;
+                        req.session.IsAdmin = (user.isAdmin === 1); // bool doesn't work in mysql? so it's an int instead
+
+                        res.redirect("/admin");
+                        return;
+                    }
+                }
+                res.send("Incorrect Username or Password")
+            });
         }
         else
         {
@@ -218,19 +225,26 @@ module.exports = (app) => {
                     isVaildPass = bcrypt.compareSync(password, userInfo.password);
                 }
 
-                req.session.LoggedIn = (isVaildUser && isVaildPass);
-                req.session.Username = username;
-                req.session.PermissionLevel = userInfo.permissionLevel;
-                req.session.IsAdmin = false;
+                let vaild = (isVaildUser && isVaildPass);
 
-                res.redirect("/admin");
-                return;
+                if (vaild)
+                {
+                    req.session.LoggedIn = true;
+                    req.session.Username = username;
+                    req.session.PermissionLevel = userInfo.permissionLevel;
+                    req.session.IsAdmin = false;
+
+                    res.redirect("/admin");
+                }
+                else
+                {
+                    res.send("Incorrect Username or Password");
+                }
             }
             else
             {
                 res.send("Setup Error: username or password is missing in .env");
             }
         }
-        res.send("Incorrect Username or Password");
     });
 }
