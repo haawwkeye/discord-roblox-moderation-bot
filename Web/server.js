@@ -88,7 +88,7 @@ module.exports = (app) => {
         else
         {
             //TODO: Make an account with info provided
-            connection.query('SELECT * FROM accounts WHERE username = ?', [username], (error, results, fields) => {
+            connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
                 // If there is an issue with the query, output the error
                 if (error)
                 {
@@ -111,7 +111,7 @@ module.exports = (app) => {
                         pass = bcrypt.hashSync(password, 10);
                     }
 
-                    connection.query("INSERT INTO accounts VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
+                    connection.query("INSERT INTO Users VALUES (0,?,?,?)", [username, pass, giveAdmin, perms], (error, results, fields) => {
                         // If there is an issue with the query, output the error
                         if (error)
                         {
