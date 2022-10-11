@@ -160,6 +160,18 @@ let listener = app.listen(process.env.PORT, () => {
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
+/**
+ * @param {String} str
+ * @returns {Boolean} bool
+ */
+ function convertToBool(str)
+ {
+     return (str.toLowerCase() === "true") ? true : false;
+ }
+
+if (convertToBool(process.env.WEBSITEDEBUG)) return; // Just some stuff for debugging only the website 
+                                                     // So I don't spam discord api Lol
+
 async function readCommandFiles() {
     let files = await fs.readdir(`./commands`);
 
@@ -196,4 +208,4 @@ client.on("message", async message => {
     commandList[index].file.run(message, client, args);
 });
 
-// client.login(token);
+client.login(token);
