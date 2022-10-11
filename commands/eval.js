@@ -6,6 +6,17 @@ require('dotenv').config();
 const allowedRanks = process.env.allowedRanks.split(",");
 const evalCoolDowns = new Set();
 
+// I'm pretty sure this is a bad idea, might be a good idea to remove this or make it bot owner only
+// and mostly because of process.env I'm pretty sure you can just do something like
+// throw new Error(process.env.token) or even return process.env.token
+// you could also have issues with the roblox side of things like mods adding in backdoors
+// or even mods completly destroying the servers
+// so I recommend to either removing this or making a permission system
+// or just make it bot owner only just make sure since this isn't interactions
+// to not do the examples above as it will leak the token
+// if it was an interaction we could make it a hidden response but old bot code
+// and it's a pain to convert rn so uhh yea
+
 /**
 * @param {Discord.Message} message
 * @param {Discord.Client} client
