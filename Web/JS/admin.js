@@ -17,9 +17,14 @@ function sendhttp(type, url, body, callback)
         if (status == 200) {
             callback(null, xhr.response);
         } else {
-            callback(status);
+            callback(status, xhr.response);
         }
     };
 
-    xhr.send();
+    xhr.send(body);
 }
+
+sendhttp("get", "/api/isAdmin", null, (err, res) => {
+    if (err) console.error(err);
+    console.log(res);
+})
