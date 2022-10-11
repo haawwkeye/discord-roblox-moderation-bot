@@ -214,4 +214,133 @@ client.on("message", async message => {
     commandList[index].file.run(message, client, args);
 });
 
+//TODO: Rewrite interactionCreate function that I took from a bot I made awhile ago
+//      That I probably took from somewhere else Lol
+
+let interactionCreateDisabled = true; // Since this is taken from old code and needs to be redone
+                                      // I think it's best that we just disable it for now
+
+/**
+ * @param {Interaction<CacheType>} interaction
+*/
+client.on("interactionCreate", async interaction => {
+    if (interactionCreateDisabled) return; // TEMP AS THIS FUNCTION NO LONGER WORKS HERE
+    //console.log(interaction)
+    let cmdName;
+    let command;
+
+    const guildId = interaction.inGuild() && interaction.guildId.toString() || null;
+    const perms = client.getpermission(interaction.user.id)
+
+    if (interaction.isCommand())
+        cmdName = interaction.commandName;
+    else if (interaction.isButton())
+        cmdName = interaction.message.interaction.commandName
+  
+    if (guildId != null)
+    {
+        let guildcmds;
+        for (let guild of req_guildCommands)
+        {
+        if (guild.guildId === guildId)
+        {
+            guildcmds = guild.commands;
+            break;
+        }
+        }
+        if (guildcmds != null)
+        {
+        for (let cmd of guildcmds)
+        {
+            if (cmd.name != null && cmd.name === cmdName)
+            {
+            command = cmd;
+            break;
+            }
+        }
+        }
+    }
+
+    if (command == null)
+    {
+        for (let cmd of reg_commands)
+        {
+        if (cmd.name != null && cmd.name === cmdName)
+        {
+            command = cmd;
+            break;
+        }
+        }
+    }
+
+    if (interaction.isCommand())
+    {
+        if (command != null)
+        {
+            // Yup this is the permission system!
+            if (command.permission <= perms)
+            //try {
+                // wtf is this? like fr what did I try to do
+                //TODO: Fix whatever tf this mess is... Looks like it's for error catching but really wow
+                //      Very bad way of doing this I think for now it works tho since I'm lazy
+                command.run(client, interaction)
+                .catch(async (error) => {
+                    let msg = `There was an error running this command.\n${error}`;
+                    console.error(`There was an error running ${command}\n${error}`);
+                    try
+                    {
+                        try
+                        {
+                            await interaction.reply({ content: msg, ephemeral: true });
+                        }
+                        catch (error1)
+                        {
+                            await interaction.followUp(msg)
+                        }
+                    }
+                    catch (error2)
+                    {
+                        try 
+                        {
+                            await interaction.reply({ content: "There was an error running this command.", ephemeral: true })
+                        }
+                        catch (error3)
+                        {
+                            try 
+                            {
+                                await interaction.followUp(msg)
+                            }
+                            catch (err)
+                            {
+                                console.warn(`Discord maybe having problems???\n${err}`)
+                            }
+                        }
+                    }
+                })
+                .then(() => {});
+            /*
+            } catch (error) {
+                await interaction.reply({ content: "There was an error running this command.", ephemeral: true })
+                console.error(error);
+            }
+            */
+            else
+                await interaction.reply({ content: "Invaild permissions.", ephemeral: true })
+        }
+        else
+        {
+            await interaction.reply({ content: "Command function not found or removed.", ephemeral: true })
+        }
+    }
+    else if (interaction.isButton())
+    {
+        //TODO: Find out how to do this again It's been a long time
+        return; // moved to collecters in run
+    }
+    else
+    {
+        console.log(interaction)
+    }
+});
+
 client.login(token);
