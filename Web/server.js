@@ -93,6 +93,8 @@ module.exports = (app) => {
         req.session.Username = null;
         req.session.PermissionLevel = null;
         req.session.IsAdmin = null;
+        
+        res.redirect("/login");
     })
 
     // This is going to be used later on when we do the admin panel code
