@@ -42,13 +42,13 @@ module.exports = (app) => {
     {
         userInfo = null; // Not needed if using db since the user will most likely be defined in there
         connection = mysql.createConnection({
-            host: process.env.dbHost,
-            user: process.env.dbUser,
-            password: process.env.dbPassword,
-            database: process.env.dbName
+            host     : process.env.dbHost,
+            user     : process.env.dbUser,
+            password : process.env.dbPass,
+            database : process.env.dbName
         });
     }
-    
+
     app.use(session({
         secret: "secret",
         resave: true,
