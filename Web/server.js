@@ -11,9 +11,10 @@ const path = require("path");
 //      I also have no idea how 2FA works with mysql so probably won't do this for now just an idea
 //      Tho either way security on this site is REALLY bad anyways so... but better then nothing ig
 
-//TODO: Make a currently signed in user list
-//      The main reason why I want this is just so we can stop people from signing in and/or signing out
-//      forcefully when we delete an user (else they will still have access until session is invaildated)
+//TODO: Show a list of currently signed in users aswell as thier rank on the admin panel?
+//      Just like an active moderator list to see who is or isn't online nothing too big tbh
+//      Should be very easy to do something like /api/activeUsers or something should do
+//      Then we just take the list and remove the session Ids then just send that shouldn't be too hard
 
 let users = {};
 
@@ -62,10 +63,19 @@ module.exports = (app) => {
         });
     }
 
+    //TODO: Find something that can replace this
+    //      This is because in the docs it said that it could cause memory leaks if running for a long time
+    //      So might be better to find something that will work for sessions
+    //      From the docs:
+    //      **Warning:** the default server-side session storage, `MemoryStore`, is purposely not designed for a production environment.
+    //      It will leak memory under most conditions, does not scale past a single process, and is only meant for debugging and developing.
+    const sess = new session.MemoryStore();
+
     app.use(session({
         secret: "secret",
         resave: true,
-        saveUninitialized: true
+        saveUninitialized: true,
+        store: sess
     }));
     
     // Too lazy to add fatal detection on this but it should be fine?
@@ -89,10 +99,11 @@ module.exports = (app) => {
     });
 
     app.all("/logout", (req, res) => {
-        req.session.LoggedIn = null;
-        req.session.Username = null;
-        req.session.PermissionLevel = null;
-        req.session.IsAdmin = null;
+        if (!req.session.LoggedIn) return res.redirect("/login");
+
+        if (users[req.session.Username]) users[req.session.Username] = null;
+
+        req.session.destroy();
         
         res.redirect("/login");
     })
@@ -152,7 +163,8 @@ module.exports = (app) => {
                             return;
                         }
                         
-                        console.log(results);
+                        console.log(results); // DEBUG
+
                         res.send(`Successfully added user: ${username}`);
                     });
                 }
@@ -187,7 +199,25 @@ module.exports = (app) => {
                         return;
                     }
 
-                    console.log(results);
+                    console.log(results); // DEBUG
+
+                    // This might work but sadly won't kick the user out until they do something
+                    // Not like it will hurt to have them stay on the admin panel without access Lol
+                    // The most they could do is send a request and get kicked back to the login page
+                    if (users[username] != null)
+                    {
+                        let sid = users[username];
+
+                         sess.destroy(sid, (err) => {
+                            if (err)
+                            {
+                                console.error(error);
+                                return res.send(`Successfully deleted user: ${username}<br>User failed to be signed out: ${error}`);
+                            }
+
+                            users[username] = null;
+                        })
+                    }
 
                     res.send(`Successfully deleted user: ${username}`);
                 });
@@ -202,7 +232,7 @@ module.exports = (app) => {
         let username = req.body.username;
         let password = req.body.password;
 
-        if (req.session.LoggedIn)
+        if (req.session.LoggedIn && users[username] != null) // Null check for the users list
         {
             res.send("You're already signed in");
             return;
@@ -237,6 +267,9 @@ module.exports = (app) => {
 
                     if (isVaildPass)
                     {
+                        if (users[username]) return res.status(403).send(`${username} is already signed in<br>Try again later`)
+
+                        users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
                         req.session.LoggedIn = true;
                         req.session.Username = username;
                         req.session.PermissionLevel = -1;
@@ -266,6 +299,9 @@ module.exports = (app) => {
 
                 if (vaild)
                 {
+                    if (users[username]) return res.status(403).send(`${username} is already signed in<br>Try again later`)
+
+                    users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
                     req.session.LoggedIn = true;
                     req.session.Username = username;
                     req.session.PermissionLevel = userInfo.permissionLevel;
