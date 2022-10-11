@@ -35,6 +35,10 @@ const client = new Client({
     }
 });
 
+// Default values
+client.request = "No request";
+client.commandList = [];
+
 const server = require("./Web/server");
 const app = express();
 
@@ -98,6 +102,17 @@ const RBXToken = process.env.RBXToken;
 // God this took too long to type (I'm bad at spelling so hopefully no typos)
 
 /**
+ * @param {String} str
+ * @returns {Boolean} bool
+ */
+function convertToBool(str)
+{
+    return (str.toLowerCase() === "true") ? true : false;
+}
+
+let __DEBUG = convertToBool(process.env.WEBSITEDEBUG)
+
+/**
  * 
  * @param {Discord.User} author 
  * @param {string} title 
@@ -116,30 +131,30 @@ client.embedMaker = (author, title, description) => {
 
 const commandList = [];
 
-app.get('/', async (request, response) => {
-     response.sendStatus(200);
+app.get('/', async (req, res) => {
+     res.sendStatus(200);
 });
 
-app.get(`/get-request`, async (request, response) => {
-    response.status(200).send(client.request);
+app.get(`/get-request`, async (req, res) => {
+    res.status(200).send(client.request);
 });
 
-app.post(`/verify-request`, async (request, response) => {
+app.post(`/verify-request`, async (req, res) => {
     let commandRequest = client.request;
-    if(commandRequest === "No request") return response.sendStatus(200);
-    let successStatus = request.headers.success;
-    let message = request.headers.message;
+    if(commandRequest === "No request") return res.sendStatus(200);
+    let successStatus = req.headers.success;
+    let message = req.headers.message;
 
     let channel = client.channels.cache.get(commandRequest.channelID);
     if(!channel) {
-        return response.sendStatus(200);
+        return res.sendStatus(200);
     }
 
     if(successStatus == "true") {
-        if("moderator" in request.headers) {
+        if("moderator" in req.headers) {
             channel.send(`<@${commandRequest.authorID}>`);
             let embed = client.embedMaker(client.users.cache.get(commandRequest.authorID), "Success", message)
-            embed.addField("Ban Information", `**Moderator**: ${request.headers.moderator}\n**Reason**: ${request.headers.reason}`);
+            embed.addField("Ban Information", `**Moderator**: ${req.headers.moderator}\n**Reason**: ${req.headers.reason}`);
             channel.send(embed);
         } else {
             channel.send(`<@${commandRequest.authorID}>`);
@@ -152,7 +167,7 @@ app.post(`/verify-request`, async (request, response) => {
 
     client.request = "No request";
 
-    return response.sendStatus(200);
+    return res.sendStatus(200);
 });
 
 let listener = app.listen(process.env.PORT, () => {
@@ -160,16 +175,7 @@ let listener = app.listen(process.env.PORT, () => {
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
-/**
- * @param {String} str
- * @returns {Boolean} bool
- */
- function convertToBool(str)
- {
-     return (str.toLowerCase() === "true") ? true : false;
- }
-
-if (convertToBool(process.env.WEBSITEDEBUG)) return; // Just some stuff for debugging only the website 
+if (__DEBUG) return; // Just some stuff for debugging only the website 
                                                      // So I don't spam discord api Lol
 
 async function readCommandFiles() {
