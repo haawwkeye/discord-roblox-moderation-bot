@@ -1,10 +1,30 @@
+//TODO: Work on some settings
+//      by this I mean some example settings stuff that could be nice to have etc
+
 {
     // Settings for the discord bot
     "bot": {
-
+        "permissions": {
+            "roles": {
+                "roleId": -1
+            },
+            "users": {
+                "userId": -1
+            },
+            "default": -1
+        }
     },
     // Settings for the website (when/if done)
     "web": {
 
+    },
+    // Settings for roblox
+    "roblox": {
+        // Universe Id's for the places being used (and name if you want)
+        // example: "123456789": "Example Universe"
+        // If there is no name provided it will grab the current name from roblox
+        "universeIdList": {
+
+        }
     }
 }
