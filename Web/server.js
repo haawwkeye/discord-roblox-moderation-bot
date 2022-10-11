@@ -35,6 +35,9 @@ module.exports = (app) => {
         password: process.env.localPassword
     }
 
+    let fatal = false; // An fatal error happened in the database so we want to shutdown everything
+                       // Mostly likely because access was denied or something /shrug idk the errors
+
     if (dbEnabled)
     {
         userInfo = null; // Not needed if using db since the user will most likely be defined in there
@@ -45,13 +48,14 @@ module.exports = (app) => {
             database: process.env.dbName
         });
     }
-
+    
     app.use(session({
         secret: "secret",
         resave: true,
         saveUninitialized: true
     }));
     
+    // Too lazy to add fatal detection on this but it should be fine?
     app.use("/css", express.static("Web/CSS"))
     app.use("/img", express.static("Web/Images"))
     app.use("/js", express.static("Web/JS"))
@@ -60,23 +64,27 @@ module.exports = (app) => {
     app.use(express.urlencoded({ extended: true }));
 
     app.get("/admin", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         if (req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "admin.html"));
         else res.redirect("/login");
     });
 
     app.get("/login", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"));
         else res.redirect("/admin");
     });
 
     // This is going to be used later on when we do the admin panel code
     app.get("/api/isAdmin", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         if (req.session.LoggedIn) res.send(req.session.isAdmin || false);
         else res.status(403).send("You must be signed in to access this.")
     })
 
     // Account Creation
     app.post("/api/editUser", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         let username  = req.body.username;
         let password  = req.body.password;
         let giveAdmin = req.body.isAdmin || 0;
@@ -92,6 +100,7 @@ module.exports = (app) => {
                 // If there is an issue with the query, output the error
                 if (error)
                 {
+                    if (error.fatal) fatal = true;
                     console.error(error);
                     res.status(500).send("Database Error<br>Please try again later.");
                     return;
@@ -115,6 +124,7 @@ module.exports = (app) => {
                         // If there is an issue with the query, output the error
                         if (error)
                         {
+                            if (error.fatal) fatal = true;
                             console.error(error);
                             res.status(500).send("Database Error<br>Please try again later.");
                             return;
@@ -130,6 +140,7 @@ module.exports = (app) => {
 
     //Account Deletion
     app.delete("/api/editUser", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         let username = req.body.username;
 
         let isAdmin  = (req.session.LoggedIn && req.session.IsAdmin);
@@ -148,6 +159,7 @@ module.exports = (app) => {
                     // If there is an issue with the query, output the error
                     if (error)
                     {
+                        if (error.fatal) fatal = true;
                         console.error(error);
                         res.status(500).send("Database Error<br>Please try again later.");
                         return;
@@ -164,6 +176,7 @@ module.exports = (app) => {
     // Login system
     //TODO: Learn how to send a user back to login on fail with a popup saying what went wrong
     app.post("/api/auth", (req, res) => {
+        if (fatal) return res.sendStatus(500);
         let username = req.body.username;
         let password = req.body.password;
 
@@ -182,7 +195,9 @@ module.exports = (app) => {
         {
             connection.query('SELECT * FROM Users WHERE username = ?', [username], (error, results, fields) => {
                 // If there is an issue with the query, output the error
-                if (error) {
+                if (error)
+                {
+                    if (error.fatal) fatal = true;
                     console.error(error);
                     res.status(500).send("Database Error<br>Please try again later.");
                     return;
