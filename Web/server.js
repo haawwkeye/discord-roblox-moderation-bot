@@ -4,8 +4,20 @@ const bcrypt = require("bcrypt");
 const express = require("express"); // Yea idk it's just how it works ig /shrug
 const path = require("path");
 
+//TODO: Add an 2FA system (This would stop people that shouldn't have access in the first place)
+//      No email support cause I have NO idea how to run/make an email server
+//      But something simple like Google Auth, Aswell as maybe some backup codes
+//      This would take alot of time to do and would probably require me to edit some stuff in the db
+//      I also have no idea how 2FA works with mysql so probably won't do this for now just an idea
+//      Tho either way security on this site is REALLY bad anyways so... but better then nothing ig
+
+//TODO: Make a currently signed in user list
+//      The main reason why I want this is just so we can stop people from signing in and/or signing out
+//      forcefully when we delete an user (else they will still have access until session is invaildated)
+
+let users = {};
+
 /**
- * 
  * @param {String} str
  * @returns {Boolean} bool
  */
@@ -18,6 +30,7 @@ function convertToBool(str)
  * @param {express.Application} app
  */
 module.exports = (app) => {
+    if (!convertToBool(process.env.enableAdminWebsite)) return; // WEBSITE DISABLED
     let dbEnabled = convertToBool(process.env.dbEnabled);
     let hashed    = convertToBool(process.env.hashed);
 
@@ -74,6 +87,13 @@ module.exports = (app) => {
         if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"));
         else res.redirect("/admin");
     });
+
+    app.all("/logout", (req, res) => {
+        req.session.LoggedIn = null;
+        req.session.Username = null;
+        req.session.PermissionLevel = null;
+        req.session.IsAdmin = null;
+    })
 
     // This is going to be used later on when we do the admin panel code
     app.get("/api/isAdmin", (req, res) => {
