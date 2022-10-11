@@ -1,3 +1,16 @@
+-- Yes this code was taken from the db visualizer I was using
+-- Is this good code? idk maybe /shrug
+
+--TODO: find out how to do a ranking system since we can add more then one game to the settings
+--      Example: {"UniverseId1": 1, "UniverseId2": 2}
+--      permission level will still outrank this but if you have it set to the default you should be fine
+--      This would basicully replace the permission system and have a rank system instead
+--      of course we can still just have an "overall" system still
+--      but would be nice to have when lets say you're a studio and want to keep mods seperate
+--      I also still need to look into .env tables so we can have more then one roblox open cloud key
+--      This way we can define something in the settings like {"key1": {"UniverseId": "x"}} or something
+--      tho idk yet this might be too big of an idea /shrug
+
 -- AdminPanel.Users definition
 
 CREATE TABLE `Users` (
