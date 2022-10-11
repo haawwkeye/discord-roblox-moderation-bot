@@ -173,7 +173,7 @@ module.exports = (app) => {
             //TODO: Delete an account with info provided
             if (req.session.Username == username)
             {
-                res.status(403).send(`Cannot remove self from database.\nPlease do this manually by going into the mysql console and using the following command:\nDELETE FROM Users WHERE username = ${username}`);
+                res.status(403).send(`Cannot remove self from database.\nPlease do this manually by going into the mysql console and using the following command:<br>DELETE FROM Users WHERE username = ${username}`);
             }
             else
             {
