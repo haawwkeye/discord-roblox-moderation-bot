@@ -109,9 +109,21 @@ module.exports = (app) => {
     })
 
     // This is going to be used later on when we do the admin panel code
-    app.get("/api/isAdmin", (req, res) => {
+    app.get("/api/userInfo", (req, res) => {
         if (fatal) return res.sendStatus(500);
-        if (req.session.LoggedIn) res.send(req.session.IsAdmin);
+        let user = req.session;
+        if (user != null && user.LoggedIn) res.status(200).send({
+            Username: user.Username,
+            PermissionLevel: user.PermissionLevel,
+            IsAdmin: user.IsAdmin
+        });
+        else res.status(403).send("You must be signed in to access this.")
+    })
+
+    app.get("/api/users", (req, res) => {
+        if (fatal) return res.sendStatus(500);
+        let user = req.session;
+        if (user != null && user.LoggedIn) res.status(200).send(users); // Too lazy rn
         else res.status(403).send("You must be signed in to access this.")
     })
 
