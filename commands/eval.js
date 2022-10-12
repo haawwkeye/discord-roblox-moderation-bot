@@ -8,7 +8,7 @@ const evalCoolDowns = new Set();
 
 // I'm pretty sure this is a bad idea, might be a good idea to remove this or make it bot owner only
 // and mostly because of process.env I'm pretty sure you can just do something like
-// throw new Error(process.env.token) or even return process.env.token
+// throw new Error(process.env.token) or even return process.env.token (just learnt eval is a thing nvm)
 // you could also have issues with the roblox side of things like mods adding in backdoors
 // or even mods completly destroying the servers
 // so I recommend to either removing this or making a permission system
