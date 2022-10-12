@@ -82,7 +82,7 @@ const RBXToken = process.env.RBXToken;
 
 //TODO: remove dotenv.config() from all scripts but this one (I don't think it's required for it to be in every script??)
 
-//TODO: (optional) Make an web admin panel for all the commands
+//TODO: Make an web admin panel for all the commands
 //      maybe add a way to sign in with discord and check if the user has access not like I know how to do that
 //      The most I could do is make an mySQL database with an account list with permission levels
 //      and make it so only an admin account can create/remove accounts from the mySQL database (even tho I just learnt how to make an database locally)
@@ -90,12 +90,19 @@ const RBXToken = process.env.RBXToken;
 //TODO: (This will help with permission system) Spilt some stuff from .env into settings.json
 //      Stuff like cooldown, allowedRanks, etc will be in settings.json while stuff like the token would be in .env
 
+//I'm going to hate this one so much....
+//TODO: Convert ALL commands currently to work WITHOUT the bot that way the website can work
+//      The reason why I want to do this is just so the bot can use the function to run the command
+//      As well can the website currently it's bot only
+//      We could always still run the command and have the bot log it tho
+//      But this is still a pain so that's going to be fun see example.command.js for more info
+
 //TL;DR
 //TODO: Use Open Cloud API for commands instead of using /get-request
 //TODO: Permission level system to stop lower ranks from using certain commands instead of giving all ranks full access
 //TODO: Convert commands to be slash commands (I will probably keep message commands maybe)
 //TODO: Check to see if dotenv needs to be used in EVERY script instead of just in index
-//TODO: (optional) Make a website that does the same thing the bot does but in web form ig
+//TODO: Make a website that does the same thing the bot does but in web form ig
 //TODO: make a settings.json file this should help with permission system since we can put everything but the tokens in there
 
 // That should be it for the todo comments I hope I might see what I can do later
