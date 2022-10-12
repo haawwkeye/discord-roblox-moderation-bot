@@ -1,1 +1,44 @@
+* {
+    color-scheme: dark;
+}
 
+.Rank[data-rank="SITEADMIN"] {
+    text-shadow: 0 0 5px gold;
+}
+
+.Rank[data-rank="TRIALMOD"] {
+    text-shadow: 0 0 5px greenyellow;
+}
+
+.Rank[data-rank="MOD"] {
+    text-shadow: 0 0 5px lightgreen;
+}
+
+.Rank[data-rank="ADMIN"] {
+    text-shadow: 0 0 5px cornflowerblue;
+}
+
+.Rank[data-rank="SUPERADMIN"] {
+    text-shadow: 0 0 5px cyan;
+}
+
+.Rank[data-rank="DEVELOPER"] {
+    text-shadow: 0 0 5px red;
+}
+
+.Rank[data-rank="OWNER"] {
+    text-shadow: 0 0 5px gold;
+}
+
+/* How did you get access? */
+.Rank[data-rank="NONE"],
+.Rank[data-rank="PLAYER"],
+.Rank[data-rank="VIP"] {
+    /* color: red; */
+    text-shadow: 0 0 5px blue;
+}
+
+
+.Rank, .User {
+    font-weight: bolder;
+}
