@@ -284,7 +284,7 @@ module.exports = (app) => {
                         users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
                         req.session.LoggedIn = true;
                         req.session.Username = username;
-                        req.session.PermissionLevel = -1;
+                        req.session.PermissionLevel = user.permissionLevel;
                         req.session.IsAdmin = (user.isAdmin === 1); // bool doesn't work in mysql? so it's an int instead
 
                         res.redirect("/admin");
