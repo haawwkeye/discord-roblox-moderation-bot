@@ -183,7 +183,7 @@ let listener = app.listen(process.env.PORT, () => {
 });
 
 if (__DEBUG) return; // Just some stuff for debugging only the website 
-                                                     // So I don't spam discord api Lol
+                     // So I don't spam discord api Lol
 
 async function readCommandFiles() {
     let files = await fs.readdir(`./commands`);
