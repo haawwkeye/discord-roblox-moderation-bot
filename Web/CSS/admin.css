@@ -34,10 +34,8 @@
 .Rank[data-rank="NONE"],
 .Rank[data-rank="PLAYER"],
 .Rank[data-rank="VIP"] {
-    /* color: red; */
-    text-shadow: 0 0 5px blue;
+    color: red;
 }
-
 
 .Rank, .User {
     font-weight: bolder;
