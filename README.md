@@ -1,1 +1,1 @@
-# discord-roblox-moderation-bot
+# Discord to Roblox Moderation Bot
