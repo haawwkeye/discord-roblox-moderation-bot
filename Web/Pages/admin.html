@@ -11,12 +11,49 @@
         <h1>
             Admin Panel
         </h1>
+        <!--
+            Legit just an element to hold the users info Lol
+        -->
+        <div id="UserInfo"></div>
         <hr>
-        <div id="main">
+        <!--
+            This is the current online admin users list
+            This will list all the current admins online and there rank
+            Rank will be based on the permission level so example:
 
-        </div>
-        <div id="admin">
+            -1 is None
+            0 is VIP (This is just how I give VIP server owners access to kick and other stuff)
+            1 is Trial Mod
+            2 is Mod
+            3 is Admin
+            4 is Super Admin
+            5 is Developer(s)
+            6 or above is Owner(s)
 
+            Now this is only an example of what I did so the ranks MIGHT not be correct in your case
+        -->
+        <div id="OnlineUsers"></div>
+        <!--
+            This is the response of the command so for example
+            When we send a command we wait for a response if it times out we send an "error"
+            Something like: "Error: CommandName Timed out"
+            This will also allow for more then one response since we can append it
+            and we can just have a script handle the backend of things like how long it's there etc
+            Should be easy to do Plus I can always add an api to auto generate the html
+            then it will insert that ofc I will escape the html I'm not that dumb
+        -->
+        <div id="CommandResponse"></div>
+        <!--
+            Simple command list this also has the permission level required for the commands
+            So I might automate this via scripts since we can just make it so the command list
+            only shows what you at you're current level can handle
+            I could also make command auto generate via changing some code in the commands
+            But this is just a simple list for now
+        -->
+        <div id="Commands">
+            <ul class="CommandList">
+                <li class="CommandItem" data-PermissionLvl="-1">Test</li>
+            </ul>
         </div>
     </body>
 </html>
