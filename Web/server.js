@@ -133,7 +133,7 @@ module.exports = (app) => {
         let username  = req.body.username;
         let password  = req.body.password;
         let giveAdmin = req.body.isAdmin || 0;
-        let perms     = req.body.perms || 0;
+        let perms     = req.body.perms || 1;
 
         let isAdmin   = (req.session.LoggedIn && req.session.IsAdmin);
         
