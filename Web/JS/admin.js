@@ -85,7 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             let rankName = rankings[user.PermissionLevel];
-            let userRank = rankName != null && rankName.toUpperCase() || rankings[6].toUpperCase();
+            if (user.PermissionLevel > 6) rankName = rankings[6]; else if (rankName == null) rankName = "NONE";
+            let userRank = rankName.toUpperCase();
 
             let rank = document.createElement("a");
             rank.className = "Rank";
