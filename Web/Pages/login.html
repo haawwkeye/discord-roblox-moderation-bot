@@ -6,11 +6,25 @@
         <title>Admin Login</title>
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
         <link rel="stylesheet" href="/css/login.css">
+        <script src="/js/jquery.min.js"></script>
     </head>
     <body>
+        <script>
+            function SubForm()
+            {
+                $.ajax({
+                    url: '/api/auth',
+                    type: 'post',
+                    data: $('#loginForm').serialize(),
+                    success: function(res){
+                        alert(res);
+                    }
+                });
+            }
+        </script>
         <div class="login">
             <h1>Admin Panel Login</h1>
-            <form action="/api/auth" method="post">
+            <form id="loginForm" method="post" onsubmit="SubForm()"> <!--action="/api/auth" method="post" onended="console.log('Done')">-->
                 <label for="username">
                     <em class="fas fa-user"></em>
                 </label>
