@@ -1,5 +1,5 @@
 const session = require("express-session");
-const MemoryStore = require('memorystore')(session)
+const MemoryStore = require("memorystore")(session)
 const mysql = require("mysql");
 const bcrypt = require("bcrypt");
 const express = require("express"); // Yea idk it's just how it works ig /shrug
@@ -73,6 +73,7 @@ module.exports = (app) => {
         cookie: { maxAge: 86400000 },
         store: sess,
         resave: false,
+        saveUninitialized: true, // I should probably find out what this does
         secret: "secret",
     }));
     
