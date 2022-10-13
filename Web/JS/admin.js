@@ -72,6 +72,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 IsAdmin: userInfo.IsAdmin
             }
 
+            // Setup Admin Only
+
+            let AdminElems = document.getElementsByClassName("SiteAdmin");
+
+            for (const Elem of AdminElems) {
+                if (!user.IsAdmin)
+                {
+                    Elem.remove();
+                    continue;
+                }
+                //TODO: Setup element after check
+                break; // TEMP UNTIL SETUP IS FINISHED
+            }
+
+            // End Of Setup
+
             //TODO: Find out a way to do this better this is a mess like fr please clean this up
 
             let infoElem = document.getElementById("UserInfo");
@@ -86,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             let rankName = rankings[user.PermissionLevel];
-            let userRank = rankName != null && rankName.toUpperCase() || user.PermissionLevel;
+            let userRank = rankName != null && rankName.toUpperCase() || rankings[6].toUpperCase();
 
             let rank = document.createElement("a");
             rank.className = "Rank";
@@ -102,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
             infoElem.appendChild(rank);
 
             let userHtml = document.createElement("a");
+            userHtml.setAttribute("data-rank", rank.getAttribute("data-rank") || "NONE")
             userHtml.className = "User";
             userHtml.innerHTML = user.Username;
             infoElem.appendChild(userHtml);

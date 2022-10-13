@@ -8,13 +8,17 @@
         <script src="/js/admin.js"></script>
     </head>
     <body>
-        <h1>
+        <h1 id="title">
             Admin Panel
         </h1>
-        <!--
-            Legit just an element to hold the users info Lol
-        -->
-        <div id="UserInfo"></div>
+        <hr>
+        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <!--
+                Legit just an element to hold the users info Lol
+            -->
+            <div id="UserInfo"></div>
+            <a id="logoutBtn" href="/logout">LOGOUT</a>
+        </div>
         <hr>
         <!--
             This is the current online admin users list
@@ -52,7 +56,7 @@
         -->
         <div id="Commands">
             <ul class="CommandList">
-                <li class="CommandItem" data-PermissionLvl="-1">Test</li>
+                <li class="CommandItem SiteAdmin" data-PermissionLvl="-1">Test</li>
             </ul>
         </div>
     </body>

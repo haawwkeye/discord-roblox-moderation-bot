@@ -2,41 +2,133 @@
     color-scheme: dark;
 }
 
+#title {
+    text-align: center;
+}
+
+#logoutBtn {
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    justify-content: right;
+    color: white;
+    transition: 0.2s;
+}
+
+#logoutBtn:hover {
+    color: red;
+    text-shadow: 0 0 5px red;
+}
+
+/* Ranks */
+
 .Rank[data-rank="SITEADMIN"] {
     text-shadow: 0 0 5px gold;
 }
+
+.Rank[data-rank="SITEADMIN"]:hover {
+    color: gold;
+}
+
 
 .Rank[data-rank="TRIALMOD"] {
     text-shadow: 0 0 5px greenyellow;
 }
 
+.Rank[data-rank="TRIALMOD"]:hover {
+    color: greenyellow;
+}
+
+
 .Rank[data-rank="MOD"] {
     text-shadow: 0 0 5px lightgreen;
 }
+
+.Rank[data-rank="MOD"]:hover {
+    color: lightgreen;
+}
+
 
 .Rank[data-rank="ADMIN"] {
     text-shadow: 0 0 5px cornflowerblue;
 }
 
+.Rank[data-rank="ADMIN"]:hover {
+    color: cornflowerblue;
+}
+
+
 .Rank[data-rank="SUPERADMIN"] {
     text-shadow: 0 0 5px cyan;
 }
+
+.Rank[data-rank="SUPERADMIN"]:hover {
+    color: cyan;
+}
+
 
 .Rank[data-rank="DEVELOPER"] {
     text-shadow: 0 0 5px red;
 }
 
+.Rank[data-rank="DEVELOPER"]:hover {
+    color: red;
+}
+
+
 .Rank[data-rank="OWNER"] {
     text-shadow: 0 0 5px gold;
+}
+
+.Rank[data-rank="OWNER"]:hover {
+    color: gold;
 }
 
 /* How did you get access? */
 .Rank[data-rank="NONE"],
 .Rank[data-rank="PLAYER"],
 .Rank[data-rank="VIP"] {
+    color: crimson;
+}
+
+.Rank[data-rank="NONE"],
+.Rank[data-rank="PLAYER"],
+.Rank[data-rank="VIP"]:hover {
+    text-shadow: 0 0 5px crimson;
+}
+
+.User[data-rank="TRIALMOD"]:hover {
+    color: greenyellow;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="MOD"]:hover {
+    color: lightgreen;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="ADMIN"]:hover {
+    color: cornflowerblue;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="SUPERADMIN"]:hover {
+    color: cyan;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="DEVELOPER"]:hover {
     color: red;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="OWNER"]:hover {
+    color: gold;
+    text-shadow: 0 0 5px currentColor;
+}
+.User[data-rank="NONE"],
+.User[data-rank="PLAYER"],
+.User[data-rank="VIP"]:hover {
+    color: crimson;
+    text-shadow: 0 0 5px crimson;
 }
 
 .Rank, .User {
     font-weight: bolder;
+    transition: 0.2s;
 }
