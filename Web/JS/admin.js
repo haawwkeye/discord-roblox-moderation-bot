@@ -28,44 +28,27 @@ const escapeHtml = (unsafe) => {
         .replace(/'/g, "&#039;");
 }
 
-/**
- * 
- * @param {String} type
- * @param {String} url
- * @param {Document | XMLHttpRequestBodyInit | null | undefined}
- * @param {void} callback
- */
-function sendhttp(type, url, body, callback)
-{
-    let xhr = new XMLHttpRequest();
-    xhr.open(type, url, true);
-
-    xhr.onload = () => {
-
-        let status = xhr.status;
-
-        if (status == 200) {
-            callback(null, xhr.response);
-        } else {
-            callback(status, xhr.response);
-        }
-    };
-
-    xhr.send(body);
-}
-
 // We want to wait for everything to load before attempting to do any of this since this script is probably at the top of body
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     try {
         let userInfo;
-        sendhttp("get", "/api/userInfo", null, (err, res) => {
-            if (err)
-            {
-                console.error(err);
-                throw err;
+        await $.ajax({
+            type: "get",
+            url: "/api/userInfo",
+            // data: "data",
+            // dataType: "dataType",
+            success: function (res) {
+                if (typeof(res) != "object") {
+                    return console.error(res);
+                }
+                userInfo = res;
             }
-            userInfo = JSON.parse(res);
+        });
 
+        //TODO: switch to using jquery?
+
+        if (userInfo != null)
+        {
             let user = {
                 Username: escapeHtml(userInfo.Username),
                 PermissionLevel: userInfo.PermissionLevel,
@@ -122,7 +105,21 @@ document.addEventListener("DOMContentLoaded", () => {
             userHtml.className = "User";
             userHtml.innerHTML = user.Username;
             infoElem.appendChild(userHtml);
-        });
+        }
+        else
+        {
+            let rank = document.createElement("a");
+            rank.className = "Rank";
+            rank.setAttribute("data-rank", "NONE")
+            rank.innerHTML = `[NONE] `;
+            infoElem.appendChild(rank);
+
+            let userHtml = document.createElement("a");
+            userHtml.setAttribute("data-rank", "NONE")
+            userHtml.className = "User";
+            userHtml.innerHTML = "N/A";
+            infoElem.appendChild(userHtml);
+        }
     } catch (error) {
         console.error(error);
         alert(error);
