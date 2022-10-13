@@ -92,7 +92,7 @@ module.exports = (app) => {
         else res.redirect("/login");
     });
 
-    app.get("/login", (req, res) => {
+    app.all("/login", (req, res) => {
         if (fatal) return res.sendStatus(500);
         if (!req.session.LoggedIn) res.sendFile(path.join(__dirname, "Pages", "login.html"));
         else res.redirect("/admin");
