@@ -1,4 +1,5 @@
 const session = require("express-session");
+const MemoryStore = require('memorystore')(session)
 const mysql = require("mysql");
 const bcrypt = require("bcrypt");
 const express = require("express"); // Yea idk it's just how it works ig /shrug
@@ -63,19 +64,16 @@ module.exports = (app) => {
         });
     }
 
-    //TODO: Find something that can replace this
-    //      This is because in the docs it said that it could cause memory leaks if running for a long time
-    //      So might be better to find something that will work for sessions
-    //      From the docs:
-    //      **Warning:** the default server-side session storage, `MemoryStore`, is purposely not designed for a production environment.
-    //      It will leak memory under most conditions, does not scale past a single process, and is only meant for debugging and developing.
-    const sess = new session.MemoryStore();
+    //TODO: Test replacement for session.MemoryStore
+    const sess = new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    });
 
     app.use(session({
+        cookie: { maxAge: 86400000 },
+        store: sess,
+        resave: false,
         secret: "secret",
-        resave: true,
-        saveUninitialized: true,
-        store: sess
     }));
     
     // Too lazy to add fatal detection on this but it should be fine?
