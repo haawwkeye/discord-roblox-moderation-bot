@@ -2,6 +2,39 @@
     color-scheme: dark;
 }
 
+.alert {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: 0.6s;
+  margin-bottom: 15px;
+}
+
+.alert.success {background-color: #04AA6D;}
+.alert.info {background-color: #2196F3;}
+.alert.warning {background-color: #ff9800;}
+
+.alert .closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.alert .closebtn:hover {
+  color: black;
+}
+
+#OnlineUsers {
+    display: none; /* It's going to be scripted so this is fine */
+}
+
 #title {
     text-align: center;
 }
@@ -91,8 +124,8 @@
     color: crimson;
 }
 
-.Rank[data-rank="NONE"],
-.Rank[data-rank="PLAYER"],
+.Rank[data-rank="NONE"]:hover,
+.Rank[data-rank="PLAYER"]:hover,
 .Rank[data-rank="VIP"]:hover {
     text-shadow: 0 0 5px crimson;
 }
@@ -121,8 +154,8 @@
     color: gold;
     text-shadow: 0 0 5px currentColor;
 }
-.User[data-rank="NONE"],
-.User[data-rank="PLAYER"],
+.User[data-rank="NONE"]:hover,
+.User[data-rank="PLAYER"]:hover,
 .User[data-rank="VIP"]:hover {
     color: crimson;
     text-shadow: 0 0 5px crimson;

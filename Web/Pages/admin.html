@@ -16,8 +16,9 @@
         <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <!--
                 Legit just an element to hold the users info Lol
+                The id is for setting the current user the class is styling
             -->
-            <div id="UserInfo"></div>
+            <div id="UserInfo" class="UserInfo"></div>
             <a id="logoutBtn" href="/logout">LOGOUT</a>
         </div>
         <hr>
@@ -39,7 +40,7 @@
         -->
         <div id="OnlineUsers"></div>
         <!--
-            This is the response of the command so for example
+            This is for alerts but mainly for command responses
             When we send a command we wait for a response if it times out we send an "error"
             Something like: "Error: CommandName Timed out"
             This will also allow for more then one response since we can append it
@@ -47,7 +48,7 @@
             Should be easy to do Plus I can always add an api to auto generate the html
             then it will insert that ofc I will escape the html I'm not that dumb
         -->
-        <div id="CommandResponse"></div>
+        <div id="Alerts"></div>
         <!--
             Simple command list this also has the permission level required for the commands
             So I might automate this via scripts since we can just make it so the command list
