@@ -1,4 +1,10 @@
-//TODO: Work on some settings
+const fs = require("fs");
+const path = require("path");
+
+let settings;
+
+const settingsPath = path.join(__dirname, "settings.json");
+const defaultSettings = `//TODO: Work on some settings
 //      by this I mean some example settings stuff that could be nice to have etc
 
 {
@@ -39,4 +45,25 @@
             // This is not to be used for now just use universe (I don't wanna do more then one for rn)
         }
     }
+}
+`
+
+/**
+ * 
+ * @param {Boolean} forceUpdate Should settings be reloaded
+ * @returns {{}} settings
+ */
+exports.getSettings = function(forceUpdate)
+{
+    if (settings && !forceUpdate) return settings;
+
+    if (!fs.existsSync(settingsPath))
+    {
+        fs.writeFileSync(settingsPath, defaultSettings);
+    }
+
+    let json = JSON.parse(fs.readFileSync(settingsPath));
+    settings = json;
+
+    return settings;
 }
