@@ -39,5 +39,6 @@ exports.build = (builder) => {
 * @param {Discord.Client} client
 */
 exports.run = async(interaction, client) => {
+    console.log(interaction);
     throw Error("Not Implemented");
 }
