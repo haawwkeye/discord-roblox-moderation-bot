@@ -1,9 +1,9 @@
-const fs = require('then-fs');
+const fs = require('fs');
 exports.commandList = [];
 
-exports.readCommandFiles = async() =>
+exports.readCommandFiles = () =>
 {
-    let files = await fs.readdir(`./commands`);
+    let files = fs.readdirSync("./commands");
 
     for(const file of files)
     {
@@ -14,12 +14,12 @@ exports.readCommandFiles = async() =>
             continue;
         }
 
-        let coreFile = require(`./commands/${file}`);
+        let coreFile = require(`../commands/${file}`);
         this.commandList.push({
             file: coreFile,
             name: file.split('.')[0]
         });
     }
 
-    this.readCommandFiles = null; // Remove function
+    this.readCommandFiles = () => {}; // Remove function
 }

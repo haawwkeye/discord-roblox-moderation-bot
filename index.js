@@ -1,12 +1,13 @@
 const args = process.argv.slice(2);
 
-const commandModule = require("./modules/commands");
-await commandModule.readCommandFiles()
-const commandList = commandModule.commandList;
-
 require('dotenv').config();
 
-if (args.length > 0 && args[0] == "setup") return require("./setup")(commandList);
+const commandModule = require("./modules/commands");
+const commandList = commandModule.commandList;
+
+commandModule.readCommandFiles()
+
+if (args.length > 0 && args[0] == "setup") return require("./setup").run(commandList);
 
 const express = require('express');
 const fs = require('then-fs');
