@@ -1,8 +1,20 @@
+const args = process.argv.slice(2);
+
+const commandModule = require("./modules/commands");
+await commandModule.readCommandFiles()
+const commandList = commandModule.commandList;
+
+require('dotenv').config();
+
+if (args.length > 0 && args[0] == "setup") return require("./setup")(commandList);
+
 const express = require('express');
 const fs = require('then-fs');
 const path = require("path");
+const settingsModule = require("./modules/settings");
+const settings = settingsModule.getSettings();
 
-const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, GuildMember } = require('discord.js');
 
 const client = new Client({
     // We don't need everything but might aswell for development purposes
@@ -41,8 +53,6 @@ client.commandList = [];
 
 const server = require("./Web/server");
 const app = express();
-
-require('dotenv').config();
 
 //TODO: Convert everything from discord.js 12 to discord.js 14
 
@@ -136,7 +146,7 @@ client.embedMaker = (author, title, description) => {
     return embed;
 }
 
-const commandList = [];
+//#region Express
 
 app.get('/', async (req, res) => {
      res.sendStatus(200);
@@ -182,26 +192,10 @@ let listener = app.listen(process.env.PORT, () => {
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
+//#endregion
+
 if (__DEBUG) return; // Just some stuff for debugging only the website 
                      // So I don't spam discord api Lol
-
-async function readCommandFiles() {
-    let files = await fs.readdir(`./commands`);
-
-    for(const file of files) {
-        if(!file.endsWith(".js")) // Skip file as it isn't a vaild comamnd
-        {
-            if (file.endsWith(".disabled")) continue; // most likely an disabled command so let's not warn
-            console.warn((`Invalid file detected in commands folder, please move this file: ${file}`));
-            continue;
-        } 
-        let coreFile = require(`./commands/${file}`);
-        commandList.push({
-            file: coreFile,
-            name: file.split('.')[0]
-        });
-    }
-}
 
 client.on('ready', async() => {
     console.log(`Logged into the Discord account - ${client.user.tag}`);
@@ -210,15 +204,42 @@ client.on('ready', async() => {
     client.commandList = commandList;
 });
 
-client.on("message", async message => {
-    if(message.author.bot) return;
-    if(message.channel.type == "dm") return;
-    if(!message.content.startsWith(prefix)) return;
-    const args = message.content.slice(prefix.length).split(" ");
-    let command = args.shift().toLowerCase();
-    let index = commandList.findIndex(cmd => cmd.name === command);
-    if (index == -1) return;
-    commandList[index].file.run(message, client, args);
+/**
+ * 
+ * @param {GuildMember} user 
+ * @param {*} command 
+ */
+client.hasPermission = function(user, command)
+{
+    //TODO: Make permission system
+    return true; // Just return true until permission system is done
+}
+
+/**
+ * @param {Interaction<CacheType>} interaction
+*/
+client.on("interactionCreate", async interaction => {
+    if (!interaction.isChatInputCommand()) return;
+    let index = commandList.findIndex(cmd => cmd.name === interaction.commandName.toLowerCase());
+    if (index == -1) return interaction.reply({ content: `${interaction.commandName} Not Found`, ephemeral: true }); // Command not found
+    let command = commandList[index];
+    if (!client.hasPermission((interaction.member || interaction.user), command)) return interaction.reply({ content: `Invalid permissions for ${interaction.commandName}`, ephemeral: true }); // Command found but no access
+    try
+    {
+        command.file.run(interaction, client);
+    }
+    catch (err)
+    {
+        let data = {
+            content: err,
+            ephemeral: true
+        }
+
+        if (!interaction.replied)
+            return interaction.reply(data);
+        else
+            return interaction.followUp(data);
+    }
 });
 
 //TODO: Rewrite interactionCreate function that I took from a bot I made awhile ago
