@@ -1,8 +1,12 @@
-const Discord = require('discord.js');
+const Discord = require("discord.js");
+const ms = require("ms");
 const __filename__ = __filename; // Old __filename
 __filename = require("path").parse(__filename).name.toLowerCase(); // Since names have to be lower cased
 
 const embedColor = process.env.embedColor;
+
+// Permission level for the command
+exports.Level = -1;
 
 exports.help = async() => {
     let name = `**${__filename}**`;
@@ -18,7 +22,7 @@ exports.help = async() => {
  exports.build = (builder) => {
     return builder
             .setName(__filename)
-            .setDescription('Displays the help menu');
+            .setDescription("Displays the help menu");
 }
 
 /**
