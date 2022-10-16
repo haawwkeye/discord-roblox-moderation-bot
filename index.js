@@ -15,7 +15,7 @@ const path = require("path");
 const settingsModule = require("./modules/settings");
 const settings = settingsModule.getSettings();
 
-const { Client, GatewayIntentBits, REST, Routes, GuildMember } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, GuildMember, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
     // We don't need everything but might aswell for development purposes
@@ -49,8 +49,9 @@ const client = new Client({
 });
 
 // Default values
-client.request = "No request";
+client.request = {};
 client.commandList = [];
+client.interactions = [];
 
 const server = require("./Web/server");
 const app = express();
@@ -149,7 +150,7 @@ client.getBotOwner = () => {
  */
 client.embedMaker = (author, title, description) => {
     let embedColor = process.env.embedColor;
-    let embed = new Discord.EmbedBuilder();
+    let embed = new EmbedBuilder();
 
     if (embedColor) embed.setColor(embedColor);
     embed.setAuthor({
@@ -159,7 +160,7 @@ client.embedMaker = (author, title, description) => {
     embed.setTitle(title);
     embed.setDescription(description);
     embed.setFooter({
-        text: footer
+        text: "Temp Footer"
     });
     // embed.setFooter('Command created by zachariapopcorn#8105 - https://discord.gg/XGGpf3q');
     return embed;
@@ -176,32 +177,59 @@ app.get(`/get-request`, async (req, res) => {
 });
 
 app.post(`/verify-request`, async (req, res) => {
-    let commandRequest = client.request;
-    if(commandRequest === "No request") return res.sendStatus(200);
+    let requestID = req.headers.requestid;
+
+    console.log(requestID);
+    console.log(client.request[requestID]);
+    console.log(client.interactions[requestID]);
+
+    let commandRequest = client.request[requestID];
+    let interaction = client.interactions[requestID];
+    
+    if (commandRequest === undefined) return res.sendStatus(403);
+    if (interaction === undefined) return res.sendStatus(500);
+
+    delete client.request[requestID];
+    delete client.interactions[requestID];
+
     let successStatus = req.headers.success;
     let message = req.headers.message;
 
-    let channel = client.channels.cache.get(commandRequest.channelID);
-    if(!channel) {
-        return res.sendStatus(200);
-    }
+    console.log(interaction);
 
-    if(successStatus == "true") {
-        if("moderator" in req.headers) {
-            channel.send(`<@${commandRequest.authorID}>`);
-            let embed = client.embedMaker(client.users.cache.get(commandRequest.authorID), "Success", message)
+    let user = interaction.user;
+
+    if(successStatus == "true")
+    {
+        if("moderator" in req.headers)
+        {
+            let embed = client.embedMaker(user, "Success", message);
             embed.addField("Ban Information", `**Moderator**: ${req.headers.moderator}\n**Reason**: ${req.headers.reason}`);
-            channel.send(embed);
-        } else {
-            channel.send(`<@${commandRequest.authorID}>`);
-            channel.send(client.embedMaker(client.users.cache.get(commandRequest.authorID), "Success", message));
+            interaction.followUp({
+                content: `<@${user.id}>`,
+                embeds: [embed],
+                ephemeral: true
+            });
         }
-    } else {
-        channel.send(`<@${commandRequest.authorID}>`);
-        channel.send(client.embedMaker(client.users.cache.get(commandRequest.authorID), "Failure", message));
+        else
+        {
+            interaction.followUp({
+                content: `<@${user.id}>`,
+                embeds: [client.embedMaker(user, "Success", message)],
+                ephemeral: true
+            });
+        }
+    }
+    else
+    {
+        interaction.followUp({
+            content: `<@${user.id}>`,
+            embeds: [client.embedMaker(user, "Failure", message)],
+            ephemeral: true
+        });
     }
 
-    client.request = "No request";
+    // client.request
 
     return res.sendStatus(200);
 });
@@ -218,7 +246,6 @@ if (__DEBUG) return; // Just some stuff for debugging only the website
 
 client.on('ready', async() => {
     console.log(`Logged into the Discord account - ${client.user.tag}`);
-    client.request = "No request";
     client.commandList = commandList;
 });
 
