@@ -1,9 +1,11 @@
 const Discord = require('discord.js');
+const __filename__ = __filename; // Old __filename
+__filename = require("path").parse(__filename).name.toLowerCase(); // Since names have to be lower cased
 
 const embedColor = process.env.embedColor;
 
 exports.help = async() => {
-    let name = `**help**`;
+    let name = `**${__filename}**`;
     let description = "Displays the help menu";
     return `${name} - ${description}\n`;
 }
@@ -15,7 +17,7 @@ exports.help = async() => {
  */
  exports.build = (builder) => {
     return builder
-            .setName('help')
+            .setName(__filename)
             .setDescription('Displays the help menu');
 }
 
@@ -27,9 +29,14 @@ exports.run = async(interaction, client) => {
     let embed = new Discord.EmbedBuilder();
 
     if (embedColor) embed.setColor(embedColor);
-    embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
+    embed.setAuthor({
+        name: interaction.user.tag,
+        url: interaction.user.displayAvatarURL()
+    });
     embed.setTitle("Command List");
-    embed.setFooter("???");
+    embed.setFooter({
+        text: "Help Command"
+    });
 
     let description = `There are ${client.commandList.length} commands\n\n`;
 

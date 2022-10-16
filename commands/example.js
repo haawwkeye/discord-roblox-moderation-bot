@@ -3,13 +3,15 @@
 //      to make sure everything works
 
 const Discord = require('discord.js');
+const __filename__ = __filename; // Old __filename
+__filename = require("path").parse(__filename).name.toLowerCase(); // Since names have to be lower cased
 
 // This is the roblox command this is what we will be looking for on the admin website
 // with this we can also only show commands that have this Roblox function
 exports.Roblox = async() => {}
 
 exports.help = async() => {
-    let name = `**example**`;
+    let name = `**${__filename}**`;
     let description = "This command does nothing";
     return `${name} - ${description}\n`;
 }
@@ -21,7 +23,7 @@ exports.help = async() => {
  */
 exports.build = (builder) => {
     return builder
-            .setName('questionnaire')
+            .setName(__filename)
             .setDescription('Asks you a series of questions!')
             .addStringOption(option => option.setName('input').setDescription('Your name?'))
             .addBooleanOption(option => option.setName('bool').setDescription('True or False?'))
@@ -39,6 +41,5 @@ exports.build = (builder) => {
 * @param {Discord.Client} client
 */
 exports.run = async(interaction, client) => {
-    console.log(interaction);
     throw Error("Not Implemented");
 }

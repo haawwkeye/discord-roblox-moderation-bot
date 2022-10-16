@@ -125,10 +125,20 @@ const RBXToken = process.env.RBXToken;
  */
 function convertToBool(str)
 {
+    if (typeof(str) != "string") return false;
     return (str.toLowerCase() === "true") ? true : false;
 }
 
 let __DEBUG = convertToBool(process.env.WEBSITEDEBUG)
+
+client.getBotOwner = () => {
+    let owner = client.application.owner;
+    
+    if (owner != null && owner.ownerId != null) return owner.ownerId;
+    if (owner != null && owner.id != null) return owner.id;
+
+    return null; 
+}
 
 /**
  * 
@@ -200,7 +210,6 @@ if (__DEBUG) return; // Just some stuff for debugging only the website
 
 client.on('ready', async() => {
     console.log(`Logged into the Discord account - ${client.user.tag}`);
-    await readCommandFiles();
     client.request = "No request";
     client.commandList = commandList;
 });
@@ -213,7 +222,7 @@ client.on('ready', async() => {
 client.hasPermission = function(user, command)
 {
     //TODO: Make permission system
-    return true; // Just return true until permission system is done
+    return true; // Awaiting permission system so this will do
 }
 
 /**
@@ -221,25 +230,30 @@ client.hasPermission = function(user, command)
 */
 client.on("interactionCreate", async interaction => {
     if (!interaction.isChatInputCommand()) return;
-    let index = commandList.findIndex(cmd => cmd.name === interaction.commandName.toLowerCase());
-    if (index == -1) return interaction.reply({ content: `${interaction.commandName} Not Found`, ephemeral: true }); // Command not found
-    let command = commandList[index];
-    if (!client.hasPermission((interaction.member || interaction.user), command)) return interaction.reply({ content: `Invalid permissions for ${interaction.commandName}`, ephemeral: true }); // Command found but no access
-    try
+    if (interaction.isCommand())
     {
-        command.file.run(interaction, client);
-    }
-    catch (err)
-    {
-        let data = {
-            content: err,
-            ephemeral: true
+        let index = commandList.findIndex(cmd => cmd.name === interaction.commandName.toLowerCase());
+        if (index == -1) return interaction.reply({ content: `${interaction.commandName} Not Found`, ephemeral: true }); // Command not found
+        let command = commandList[index];
+        if (!client.hasPermission((interaction.member || interaction.user), command)) return interaction.reply({ content: `Invalid permissions for '${interaction.commandName}'`, ephemeral: true }); // Command found but no access
+        try
+        {
+            await command.file.run(interaction, client);
         }
+        catch (err)
+        {
+            console.error(err);
 
-        if (!interaction.replied)
-            return interaction.reply(data);
-        else
-            return interaction.followUp(data);
+            let data = {
+                content: "There was an error running this command.\nPlease try again later.",
+                ephemeral: true
+            }
+
+            if (!interaction.replied)
+                return interaction.reply(data);
+            else
+                return interaction.followUp(data);
+        }
     }
 });
 
