@@ -101,7 +101,7 @@ module.exports = (app) => {
     app.all("/logout", (req, res) => {
         if (!req.session.LoggedIn) return res.redirect("/login");
 
-        if (users[req.session.Username]) users[req.session.Username] = null;
+        if (users[req.session.Username]) delete users[req.session.Username];
 
         req.session.destroy();
         
@@ -227,7 +227,7 @@ module.exports = (app) => {
                                 return res.send(`Successfully deleted user: ${username}<br>User failed to be signed out: ${error}`);
                             }
 
-                            users[username] = null;
+                            delete users[username];
                         })
                     }
 
