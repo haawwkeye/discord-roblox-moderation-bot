@@ -19,7 +19,6 @@
   },
   "scripts": {
     "start": "node index",
-    "debug": "./node index",
     "reload": "node index setup"
   },
   "author": "zachariapopcorn#8105",
