@@ -1,5 +1,5 @@
 .env
-settings.json
+config.json
 node_modules
 # yea I'm too lazy to type my admin password Lol
 /node.exe

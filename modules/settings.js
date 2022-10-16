@@ -3,7 +3,7 @@ const path = require("path");
 
 let settings;
 
-const settingsPath = path.join(__dirname, "..", "settings.json");
+const settingsPath = path.join(__dirname, "..", "config.json");
 const defaultSettings = `{
     "bot": {
         "permissions": {
