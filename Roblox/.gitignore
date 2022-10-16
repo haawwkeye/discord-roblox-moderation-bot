@@ -1,6 +1,9 @@
 # Project place file
 /Roblox.rbxlx
 
+# Backup file made manually
+/BACKUP_Roblox.rbxlx
+
 # Roblox Studio lock files
 /*.rbxlx.lock
 /*.rbxl.lock
