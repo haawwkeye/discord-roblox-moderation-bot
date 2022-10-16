@@ -148,11 +148,19 @@ client.getBotOwner = () => {
  * @returns {Discord.MessageEmbed} embed
  */
 client.embedMaker = (author, title, description) => {
-    let embed = new Discord.MessageEmbed();
-    embed.setColor(process.env.embedColor);
-    embed.setAuthor(author.tag, author.displayAvatarURL());
+    let embedColor = process.env.embedColor;
+    let embed = new Discord.EmbedBuilder();
+
+    if (embedColor) embed.setColor(embedColor);
+    embed.setAuthor({
+        name: author.tag,
+        url: author.displayAvatarURL()
+    });
     embed.setTitle(title);
     embed.setDescription(description);
+    embed.setFooter({
+        text: footer
+    });
     // embed.setFooter('Command created by zachariapopcorn#8105 - https://discord.gg/XGGpf3q');
     return embed;
 }
