@@ -2,14 +2,21 @@
 //      This way I know the format and I can test using only this command until it's done
 //      to make sure everything works
 
-const Discord = require('discord.js');
+const Discord = require("discord.js");
+const ms = require("ms");
 const __filename__ = __filename; // Old __filename
 __filename = require("path").parse(__filename).name.toLowerCase(); // Since names have to be lower cased
+
+const commandCoolDown = new Set();
 
 // This is the roblox command this is what we will be looking for on the admin website
 // with this we can also only show commands that have this Roblox function
 exports.Roblox = async() => {}
 
+// Permission level for the command
+exports.Level = -1;
+
+// TODO: Auto generate help instead of doing it manually (build func might help with this?)
 exports.help = async() => {
     let name = `**${__filename}**`;
     let description = "This command does nothing";
@@ -24,16 +31,7 @@ exports.help = async() => {
 exports.build = (builder) => {
     return builder
             .setName(__filename)
-            .setDescription('Asks you a series of questions!')
-            .addStringOption(option => option.setName('input').setDescription('Your name?'))
-            .addBooleanOption(option => option.setName('bool').setDescription('True or False?'))
-            .addUserOption(option => option.setName('target').setDescription('Closest friend?'))
-            .addChannelOption(option => option.setName('destination').setDescription('Favourite channel?'))
-            .addRoleOption(option => option.setName('role').setDescription('Least favourite role?'))
-            .addIntegerOption(option => option.setName('int').setDescription('Sides to a square?'))
-            .addNumberOption(option => option.setName('num').setDescription('Value of Pi?'))
-            .addMentionableOption(option => option.setName('mentionable').setDescription('Mention something!'))
-            .addAttachmentOption(option => option.setName('attachment').setDescription('Best meme?'));
+            .setDescription("Command Description");
 }
 
 /**
