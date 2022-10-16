@@ -1,14 +1,24 @@
---# selene: allow(global_usage, unused_variable, shadowing)
 local wait = task.wait;
 
-local dataStoreService = game:GetService("DataStoreService")
+local RunService = game:GetService("RunService");
+local MockDataStoreService = require(script.Parent.Parent.Debug:WaitForChild("MockDataStoreService"));
+local MockMessagingService = require(script.Parent.Parent.Debug:WaitForChild("MockMessagingService"));
+
+local MessageService = game:GetService("MessagingService")
+local DSS = game:GetService("DataStoreService")
+
+if (RunService:IsStudio()) then
+	MessageService = MockMessagingService;
+	DSS = MockDataStoreService;
+end
+
 local playerService = game:GetService("Players")
 
 -- TODO: Use one DataStore for data instead of two?
 -- Example: DATA[uid] = {BanData, MuteData} etc
 
-local globalBanDataStore = dataStoreService:GetDataStore("bans")
-local globalMuteDataStore = dataStoreService:GetDataStore("mutes")
+local globalBanDataStore = DSS:GetDataStore("bans")
+local globalMuteDataStore = DSS:GetDataStore("mutes")
 
 function plrAdded(plr)
 	-- Server Locked

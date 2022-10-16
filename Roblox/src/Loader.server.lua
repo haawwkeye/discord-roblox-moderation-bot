@@ -1,10 +1,10 @@
---# selene: allow(global_usage, unused_variable, shadowing)
 local wait = task.wait;
 
 local HttpsService = game:GetService("HttpService")
 local adminSystem = require(script.Parent.MainModule)
+local cooldown = 3;
 
-_G.baseReplUrl = "REPL LINK HERE"
+_G.baseReplUrl = "http://localhost:8080"
 _G.getRequestEndpoint = "/get-request"
 _G.verifyRequestEndpoint = "/verify-request"
 
@@ -17,25 +17,29 @@ if adminSystem:CheckHTTP() == false then
 end
 
 while true do
-	local request
+	local cooldown_Check = (os.time() + 5);
 
-	local suc, err = pcall(function()
-		request = HttpsService:GetAsync(_G.baseReplUrl .. _G.getRequestEndpoint)
+	local suc, request = pcall(function()
+		return HttpsService:GetAsync(_G.baseReplUrl .. _G.getRequestEndpoint)
 	end)
 
-	if err then
-		warn("There was an error while attempting to connect to the administration webserver: " .. err)
+	if not suc then
+		warn("There was an error while attempting to connect to the administration webserver:", request)
+		wait(cooldown_Check-os.time())
+		continue;
 	end
 
-	local newRequest
+	warn(request)
 
-	local s, e = pcall(function()
-		newRequest = HttpsService:JSONDecode(request)
+	local s, reqs = pcall(function()
+		return HttpsService:JSONDecode(request)
 	end)
 
-	if s == true then
-		adminSystem:Run(newRequest.type, newRequest)
-	end
+	if not s then wait(cooldown_Check-os.time()) continue end; -- Json Error or no request
 
-	wait(5)
+	for _, req in pairs(reqs) do
+		if (req == nil) then continue end;
+		pcall(function() wait(cooldown) adminSystem:Run(req.type, req) end)
+	end
+	wait(cooldown_Check-os.time())
 end

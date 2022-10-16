@@ -2,12 +2,12 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ModuleScript" referent="RBXDEDD7C37A70E4FB3B913BA150D20BEE9">
+	<Item class="ModuleScript" referent="RBX25686AAE12AD419189365018499BC5EC">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<Content name="LinkedSource"><null></null></Content>
 			<string name="Name">MainModule</string>
-			<string name="ScriptGuid">{121DA007-5AE0-48B8-B275-5FEA3E20E9B9}</string>
+			<string name="ScriptGuid">{AD495028-9290-4FCA-8214-D8AA38B84619}</string>
 			<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:CheckHTTP()
@@ -28,6 +28,8 @@ function module:Destroy()
 	script:Destroy()
 end
 
+--TODO: Make command list instead of doing require over and over
+
 function module:Run(command, req)
 	for _,v in pairs(script:GetChildren()) do
 		if v.Name == command and v:IsA("ModuleScript") then
@@ -40,18 +42,29 @@ return module]]></ProtectedString>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="ModuleScript" referent="RBX7EEF0127D1714B7AAE7AB1DCCD4B198E">
+		<Item class="ModuleScript" referent="RBX231512596BF14D6C873344F61759F91F">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Announcement</string>
-				<string name="ScriptGuid">{C222A075-9BE7-46F8-8832-384201C472B5}</string>
+				<string name="ScriptGuid">{49513BE4-B032-44CD-A55A-F01E0056755B}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players"):GetPlayers()
 	local TweenService = game:GetService("TweenService")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
 	
 	local info = TweenInfo.new(
 		3,
@@ -94,7 +107,7 @@ function module:Run(request)
 	
 	MessageService:PublishAsync("Info", publishData)
 	
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully announced this to the game")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully announced this to the game")
 end
 
 return module]]></ProtectedString>
@@ -102,20 +115,21 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="Folder" referent="RBX102570BFEAB4422C841C40D8361E2F93">
+		<Item class="Folder" referent="RBX0DF63FF48EA9472C959DF96F80A8FA37">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Components</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBXFA1DCC59C13E47C7AFA94C65FF3895E4">
+			<Item class="ModuleScript" referent="RBXDBF28E6D940C41649E36074AE4285271">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Loadstring</string>
-					<string name="ScriptGuid">{9536CDDD-DAB8-4EA9-8691-AF344CAD4793}</string>
-					<ProtectedString name="Source"><![CDATA[--[[
+					<string name="ScriptGuid">{40BE5E54-53C3-494A-B2E0-093A62CBA18A}</string>
+					<ProtectedString name="Source"><![CDATA[--!nocheck
+--[[
 	Credit to einsteinK.
 	Credit to Stravant for LBI.
 	
@@ -173,12 +187,12 @@ end
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="ModuleScript" referent="RBXAE34075DD6434887B175D4A016E79391">
+				<Item class="ModuleScript" referent="RBXA39E85ED2BFE41C1A34AE8C6D2289032">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaZ</string>
-						<string name="ScriptGuid">{65A7F432-A6A9-467A-8B6B-1F82EE4C35BD}</string>
+						<string name="ScriptGuid">{23426E3C-454B-4FFC-A15C-D43F559C2B5F}</string>
 						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
 
   lzio.lua
@@ -311,13 +325,14 @@ return luaZ]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBXAB41F30B1A8849B2A4F167BE5387AEEA">
+				<Item class="ModuleScript" referent="RBXA528D948E13B472199F5BC1454E84003">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaX</string>
-						<string name="ScriptGuid">{E90C1A88-689E-4E6C-B7AE-0E9DCC914845}</string>
-						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
+						<string name="ScriptGuid">{0DD826C0-A4EB-4D56-815C-EB9D85016FF3}</string>
+						<ProtectedString name="Source"><![CDATA[--!nocheck
+--[[--------------------------------------------------------------------
 
   llex.lua
   Lua lexical analyzer in Lua
@@ -1012,13 +1027,14 @@ return luaX]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX20C40F34F93749F9A51608D309B0A6E6">
+				<Item class="ModuleScript" referent="RBX7DFEB4550BC649D2A44B5172994274E4">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaY</string>
-						<string name="ScriptGuid">{B561F9F2-262E-4969-A332-9EF58D4B2F25}</string>
-						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
+						<string name="ScriptGuid">{FF7E25EC-71D9-46E3-9BD2-EE50083C663F}</string>
+						<ProtectedString name="Source"><![CDATA[--!nocheck
+--[[--------------------------------------------------------------------
 
   lparser.lua
   Lua 5 parser in Lua
@@ -2774,13 +2790,14 @@ return luaY]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX9A670DC1654D4A328CBE3632555D5D0F">
+				<Item class="ModuleScript" referent="RBX8269151D1673499980DDE8394DC544EB">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaK</string>
-						<string name="ScriptGuid">{0563BBD9-473C-41EC-8FC9-4173C106FBA0}</string>
-						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
+						<string name="ScriptGuid">{E0FF32D7-75E6-4294-9CDF-43C579FD6282}</string>
+						<ProtectedString name="Source"><![CDATA[--!nocheck
+--[[--------------------------------------------------------------------
 
   lcode.lua
   Lua 5 code generator in Lua
@@ -2882,7 +2899,7 @@ function luaK:nummod(a, b) return a % b end
   -- ((a) - floor((a)/(b))*(b)) /* actual, for reference */
 function luaK:numpow(a, b) return a ^ b end
 function luaK:numunm(a) return -a end
-function luaK:numisnan(a) return not a == a end
+function luaK:numisnan(a) return not (a == a) end
   -- a NaN cannot equal another NaN
 
 --[[--------------------------------------------------------------------
@@ -3912,13 +3929,14 @@ return function(a) luaY = a return luaK end]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX8F7E3D2DAF674F20BC7DB7F786CDE270">
+				<Item class="ModuleScript" referent="RBX98481C5B7CFB4C35A49D6FB63499D3F2">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaU</string>
-						<string name="ScriptGuid">{EE5DAED2-0F1E-4A26-99B2-83C3B0AD80A4}</string>
-						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
+						<string name="ScriptGuid">{45B2444F-666E-4A98-B534-43FD7F819F97}</string>
+						<ProtectedString name="Source"><![CDATA[--!nocheck
+--[[--------------------------------------------------------------------
 
   ldump.lua
   Save precompiled Lua chunks
@@ -4077,7 +4095,7 @@ function luaU:from_double(x)
     mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, 53)
     exponent = exponent + 1022
   end
-  local v, byte = "" -- convert to bytes
+  local v, byte = "", "" -- convert to bytes
   x = math.floor(mantissa)
   for i = 1,6 do
     x, byte = grab_byte(x); v = v..byte -- 47:0
@@ -4299,12 +4317,12 @@ return luaU]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBXB87F8FE1C89B496B946F4DA35DE1D464">
+				<Item class="ModuleScript" referent="RBX2D31A46B1D7241859C7218386C012BF6">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">LuaP</string>
-						<string name="ScriptGuid">{B4C605A1-56B0-426C-8634-68AA6AB5F482}</string>
+						<string name="ScriptGuid">{66FB3FE9-3A62-48A1-957F-83CFC1DF1A2B}</string>
 						<ProtectedString name="Source"><![CDATA[--[[--------------------------------------------------------------------
 
   lopcodes.lua
@@ -4742,13 +4760,14 @@ return luaP]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX25CE352563C4475597C7A86E0906B46C">
+				<Item class="ModuleScript" referent="RBXE692FF23826749099A20FC4787F304E6">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">Rerubi</string>
-						<string name="ScriptGuid">{569C486F-6A13-410A-9450-CAAC65AE90BE}</string>
-						<ProtectedString name="Source"><![CDATA[local Select	= select;
+						<string name="ScriptGuid">{FEE079F2-20ED-4368-87C4-455126174499}</string>
+						<ProtectedString name="Source"><![CDATA[--!nocheck
+local Select	= select;
 local Byte		= string.byte;
 local Sub		= string.sub;
 local Opcode	= { -- Opcode types.
@@ -5489,7 +5508,7 @@ local function Wrap(Chunk, Env, Upvalues)
 					for Idx = 1, #Lupvals do
 						local List = Lupvals[Idx];
 
-						for Idz = 0, #List do
+						for Idz = 0, #List, 1 do
 							local Upv	= List[Idz];
 							local Stk	= Upv[1];
 							local Pos	= Upv[2];
@@ -5587,15 +5606,26 @@ end;]]></ProtectedString>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Script" referent="RBX4D4F6538005341DFA559DE812485D07E">
+			<Item class="Script" referent="RBXB33E85F3FE9F492E9C7DDE3FF6BFCD5C">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">MessagingHandler</string>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{9576C5CB-13AD-4B5A-AF69-34D4386DDEDB}</string>
-					<ProtectedString name="Source"><![CDATA[local MessageService = game:GetService("MessagingService")
+					<string name="ScriptGuid">{F0927419-A038-415A-830E-CED4D1E5D080}</string>
+					<ProtectedString name="Source"><![CDATA[local RunService = game:GetService("RunService");
+local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+local MessageService = game:GetService("MessagingService")
+local DSS = game:GetService("DataStoreService")
+
+if (RunService:IsStudio()) then
+	MessageService = MockMessagingService;
+	DSS = MockDataStoreService;
+end
+
 local TweenService = game:GetService("TweenService")
 local PlayerService = game:GetService("Players")
 
@@ -5725,20 +5755,21 @@ end)]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX6122BD3F1BF34622A097FF45DA6D958E">
+			<Item class="ModuleScript" referent="RBX7F89E829952E43189ADE725F1F775F36">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">SendResponse</string>
-					<string name="ScriptGuid">{94F7456F-6A79-4647-A6AD-CD322F3A00E8}</string>
+					<string name="ScriptGuid">{3ED0C691-53A2-4E95-A96C-172986F584A5}</string>
 					<ProtectedString name="Source"><![CDATA[local module = {}
 
-function module:Send(suc, message)
+function module:Send(req, suc, message)
 	game:GetService("HttpService"):RequestAsync({
 		Url = _G.baseReplUrl .. _G.verifyRequestEndpoint,
 		Method = "POST",
 		Headers = {
 			["Content-Type"] = "application/json",
+			["requestid"] = req.requestID,
 			["success"] = suc,
 			["message"] = message
 		}
@@ -5750,12 +5781,12 @@ return module]]></ProtectedString>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXD9304E4B8AC84B70847920B3C3483B18">
+			<Item class="ModuleScript" referent="RBX3B73BEE09FFD4A5791482CF547069A37">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">Demojify</string>
-					<string name="ScriptGuid">{6031A61D-7C72-4570-B852-6B444B895AED}</string>
+					<string name="ScriptGuid">{B6BC0158-9BE3-4225-AEA6-D0EF87803731}</string>
 					<ProtectedString name="Source"><![CDATA[--[[------------------------------------------------------------------------------
 	
 	Demojify: function to strip emoji-like characters from strings
@@ -5873,7 +5904,7 @@ end
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ScreenGui" referent="RBX42D578B651E348E6B3EC4598EF13E676">
+			<Item class="ScreenGui" referent="RBX5B70299438B04364BF7C6F120604DD98">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -5892,7 +5923,7 @@ end
 					<BinaryString name="Tags"></BinaryString>
 					<token name="ZIndexBehavior">1</token>
 				</Properties>
-				<Item class="Frame" referent="RBX7ABA2FCD8563426A987330E903D3F7D9">
+				<Item class="Frame" referent="RBX142382ED946A447D8F52AB25711344F4">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -5952,7 +5983,7 @@ end
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
-					<Item class="Frame" referent="RBX3B800A6017094B5295E4AC3A8987E09F">
+					<Item class="Frame" referent="RBX6D81B00033D24CF1B91F299E95DAA438">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -6013,7 +6044,7 @@ end
 							<int name="ZIndex">1</int>
 						</Properties>
 					</Item>
-					<Item class="TextLabel" referent="RBX9D8054AF73D348C1B31BCB1F68DECC4F">
+					<Item class="TextLabel" referent="RBX3538ABE9DB2949389A21BF14E2005A64">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -6101,7 +6132,7 @@ end
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
-						<Item class="UICorner" referent="RBX4DC17565AFE140E6A989E8F45D4283CE">
+						<Item class="UICorner" referent="RBXDB8C11DF091F4F85A670EA1BA4B0D813">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<UDim name="CornerRadius">
@@ -6114,7 +6145,7 @@ end
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="TextLabel" referent="RBXF7FA647DAEB146F298AE9855AAC69F67">
+					<Item class="TextLabel" referent="RBXBCCB87F229AA4738855EF25D68A3EC2A">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -6202,7 +6233,7 @@ end
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
-						<Item class="UICorner" referent="RBX2307EA7DF3AC4DB2832265F032F8F18B">
+						<Item class="UICorner" referent="RBX9B1785A1AEFF433D888DA0F6A35B040D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<UDim name="CornerRadius">
@@ -6215,7 +6246,7 @@ end
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="UICorner" referent="RBXB80F6CECD3394A02BA89853B70F4B2AF">
+					<Item class="UICorner" referent="RBX9212BB3DB0BD4806AB1FB10B6C374F6E">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<UDim name="CornerRadius">
@@ -6227,7 +6258,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="TextLabel" referent="RBXAEF98E3043A3466690985917EA62BCE1">
+					<Item class="TextLabel" referent="RBX70691FE28B924E24822FD09541F7BF2C">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -6315,7 +6346,7 @@ end
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
-						<Item class="UICorner" referent="RBX7B02C5BD92EB48A09DCC5766F816AB11">
+						<Item class="UICorner" referent="RBXF38909D039F54EBFBCB3781A9DB4B485">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<UDim name="CornerRadius">
@@ -6328,7 +6359,7 @@ end
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="TextButton" referent="RBX7DF9C43CD7DE46E49CB4C9FEE6EB82BA">
+					<Item class="TextButton" referent="RBXE238E0F78F2C437C81559BC07DE5B24D">
 						<Properties>
 							<bool name="Active">true</bool>
 							<Vector2 name="AnchorPoint">
@@ -6420,7 +6451,7 @@ end
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
-						<Item class="UICorner" referent="RBX9D20A017EA7A4C2DA3D0DD34ACB88680">
+						<Item class="UICorner" referent="RBX8FDD17D30BAF4781B91C17DB836FAE6F">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<UDim name="CornerRadius">
@@ -6432,14 +6463,14 @@ end
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="LocalScript" referent="RBX0D624769C9794FF093D8768D84480D97">
+						<Item class="LocalScript" referent="RBX2C3C2B2B9F384141AAEB294D35665796">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<bool name="Disabled">false</bool>
 								<Content name="LinkedSource"><null></null></Content>
 								<string name="Name">LocalScript</string>
 								<token name="RunContext">0</token>
-								<string name="ScriptGuid">{93FB7AE2-4CBB-4D64-B572-B926E26E1524}</string>
+								<string name="ScriptGuid">{C1442BB0-7A1A-4E38-AC9D-E51407DA86F3}</string>
 								<ProtectedString name="Source"><![CDATA[script.Parent.MouseButton1Down:Connect(function()
 	local TweenService = game:GetService("TweenService")
 	local mainFrame = script.Parent.Parent
@@ -6476,22 +6507,29 @@ end)]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="LocalScript" referent="RBXE169AF4406AC4B1181AD656D910EBDBC">
+					<Item class="LocalScript" referent="RBX2DEB4E61154D444AB36087820515F5A3">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<bool name="Disabled">false</bool>
 							<Content name="LinkedSource"><null></null></Content>
 							<string name="Name">Drag</string>
 							<token name="RunContext">0</token>
-							<string name="ScriptGuid">{F609366A-25D0-4289-BF58-4A42010BEEC1}</string>
-							<ProtectedString name="Source"><![CDATA[local UIS = game:GetService("UserInputService")
+							<string name="ScriptGuid">{984AB4A9-8B11-4D06-9C09-AAFAE5344F66}</string>
+							<ProtectedString name="Source"><![CDATA[--!nocheck
+local UIS = game:GetService("UserInputService")
+
+local dragToggle = nil;
+local dragInput = nil;
+local dragStart = nil;
+local startPos = nil
+
 function dragify(Frame)
 	dragToggle = nil
 	local dragSpeed = 0
 	dragInput = nil
 	dragStart = nil
 	local dragPos = nil
-	function updateInput(input)
+	local function updateInput(input)
 		local Delta = input.Position - dragStart
 		local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
 		game:GetService("TweenService"):Create(Frame, TweenInfo.new(0.25), {Position = Position}):Play()
@@ -6528,19 +6566,30 @@ dragify(script.Parent)]]></ProtectedString>
 				</Item>
 			</Item>
 		</Item>
-		<Item class="ModuleScript" referent="RBXEFB4861B0E1042DC855E41D64E682EA7">
+		<Item class="ModuleScript" referent="RBX1D392851438A4DAEB961437AD29448F8">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Ban</string>
-				<string name="ScriptGuid">{B8260F36-4EB4-490D-A3F4-6C91C5BDA95D}</string>
+				<string name="ScriptGuid">{BA66AA79-47C4-484C-82F6-6A8BBE167983}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+	
 	local MessageService = game:GetService("MessagingService")
-	local dataStoreService = game:GetService("DataStoreService")
-	local globalBanDataStore = dataStoreService:GetDataStore("bans")
+	local DSS = game:GetService("DataStoreService")
+	
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
+	local globalBanDataStore = DSS:GetDataStore("bans")
 	
 	local userID
 	
@@ -6549,7 +6598,7 @@ function module:Run(request)
 	end)
 	
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 	
@@ -6564,7 +6613,7 @@ function module:Run(request)
 	end)
 	
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 	
@@ -6582,7 +6631,7 @@ function module:Run(request)
 		MessageService:PublishAsync("Info", publishData)
 	end
 	
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully banned this user from the game")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully banned this user from the game")
 end
 
 return module]]></ProtectedString>
@@ -6590,16 +6639,27 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXEF42F3D1D12546CC93C05051389151D6">
+		<Item class="ModuleScript" referent="RBXE0CAB02DE57D4B0F9339DB437F928827">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Execution</string>
-				<string name="ScriptGuid">{73F6F05F-70DF-4E6E-9F71-5219EC02E717}</string>
+				<string name="ScriptGuid">{E5435A0B-0B71-445F-A09C-E95C205B2256}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 	local method = require(script.Parent.Components.Loadstring)
 	
 	local status = request.isGlobal
@@ -6616,7 +6676,7 @@ function module:Run(request)
 		
 		_G.request = request.code
 		MessageService:PublishAsync("Info", publishData)
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully executed this code to the game")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully executed this code to the game")
 	end
 	
 	if status == false then
@@ -6629,11 +6689,11 @@ function module:Run(request)
 		end)
 		
 		if e then
-			require(script.Parent.Components.SendResponse):Send("false", e)
+			require(script.Parent.Components.SendResponse):Send(request, "false", e)
 			return
 		end
 		
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully executed this code to the game")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully executed this code to the game")
 	end
 end
 
@@ -6642,19 +6702,31 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXD9B4858182B24C47AD1EA9418ACE04D0">
+		<Item class="ModuleScript" referent="RBXFFEAF4AFBC2A411EA5BF3D52E21286AB">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">CheckBan</string>
-				<string name="ScriptGuid">{9FC791B8-34C8-4AC5-B488-5CA96D25456C}</string>
+				<string name="ScriptGuid">{B683DA95-1568-46DD-852B-18F58C17EBFD}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	
 	local players = game:GetService("Players")
-	local dataStoreService = game:GetService("DataStoreService")
-	local globalBanDataStore = dataStoreService:GetDataStore("bans")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
+	local globalBanDataStore = DSS:GetDataStore("bans")
 	
 	local userID
 
@@ -6663,7 +6735,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 	
@@ -6674,12 +6746,12 @@ function module:Run(request)
 	end)
 	
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 	
 	if banData == nil or banData.isBanned == false then
-		require(script.Parent.Components.SendResponse):Send("true", "This user isn't banned")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "This user isn't banned")
 	else
 		
 		local newMod = require(script.Parent.Components.Demojify)(banData.moderator)
@@ -6700,7 +6772,7 @@ function module:Run(request)
 		end)
 		
 		if e3 then
-			require(script.Parent.Components.SendResponse):Send("false", e3)
+			require(script.Parent.Components.SendResponse):Send(request, "false", e3)
 		end
 	end
 end
@@ -6710,18 +6782,29 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX06CF06B45D1745C4A0F1F5E214506A5F">
+		<Item class="ModuleScript" referent="RBX019EAA14B6FB41A19810475709CEB662">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">GetDataValue</string>
-				<string name="ScriptGuid">{A1CB1971-CB4F-4A2D-B398-BB54ECF29700}</string>
+				<string name="ScriptGuid">{67C30C00-19B9-418A-A403-5774B78A2F3F}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
-	local dataStoreService = game:GetService("DataStoreService")
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 	local httpsService = game:GetService("HttpService")
-	local dataStore = dataStoreService:GetDataStore(request.dataStore)
+	local dataStore = DSS:GetDataStore(request.dataStore)
 	
 	local function startsWith(str, start)
 		return string.sub(str, 1, string.len(start)) == start
@@ -6733,12 +6816,12 @@ function module:Run(request)
 	end)
 	
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 	
 	if value == nil then
-		require(script.Parent.Components.SendResponse):Send("true", "There's no value for the settings supplied")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "There's no value for the settings supplied")
 		return
 	end
 	
@@ -6753,12 +6836,12 @@ function module:Run(request)
 	local newValue = require(script.Parent.Components.Demojify)(value)
 	
 	local s2,e2 = pcall(function()
-		require(script.Parent.Components.SendResponse):Send("true", newValue)
+		require(script.Parent.Components.SendResponse):Send(request, "true", newValue)
 		return
 	end)
 	
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 end
@@ -6768,17 +6851,29 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXF78DC4FB9DE04AF0A9F9B4D60D87AF61">
+		<Item class="ModuleScript" referent="RBXD3A06192FBEA426182160350D602B972">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Kick</string>
-				<string name="ScriptGuid">{DFA02E99-2A82-41B9-A6B4-1E743740A24A}</string>
+				<string name="ScriptGuid">{42DD8778-988F-43E9-AE3A-3970CE36BE51}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 
 	local userID
 
@@ -6787,7 +6882,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 
@@ -6805,7 +6900,7 @@ function module:Run(request)
 		MessageService:PublishAsync("Info", publishData)
 	end
 
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully kicked this user from the game")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully kicked this user from the game")
 end
 
 return module]]></ProtectedString>
@@ -6813,16 +6908,26 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX64CB5E17724640B291D4BEB0F1A42FFA">
+		<Item class="ModuleScript" referent="RBX7D1E678B652E4410A4DCD889C0C89981">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Lockdown</string>
-				<string name="ScriptGuid">{A96368FF-EB8D-40FA-87A7-7DB048DE11AA}</string>
+				<string name="ScriptGuid">{47B705C6-D037-4B29-BB38-1807BBCE7F75}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
 	
 	local status = request.isGlobal
 	
@@ -6842,7 +6947,7 @@ function module:Run(request)
 		}
 		
 		MessageService:PublishAsync("Info", publishData)
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully locked all the servers in the game")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully locked all the servers in the game")
 	end
 	
 	if status == false then
@@ -6858,7 +6963,7 @@ function module:Run(request)
 
 		_G.lockData = newLockData
 		
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully locked the server with the job id supplied")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully locked the server with the job id supplied")
 	end
 end
 
@@ -6867,22 +6972,33 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX7A473B55EB634D4E9DA520428A95890D">
+		<Item class="ModuleScript" referent="RBX6088BA28229E46468896584AE667406C">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Mute</string>
-				<string name="ScriptGuid">{0EAB24D6-4299-4A5D-A929-EA45DFCA1729}</string>
+				<string name="ScriptGuid">{75388CA3-3FFE-4FBA-A650-B6D9FA04F080}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
-	local dataStoreService = game:GetService("DataStoreService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 	
 	local chatService = require(game:GetService("ServerScriptService"):WaitForChild("ChatServiceRunner"):WaitForChild("ChatService"))
 	
-	local globalMuteDataStore = dataStoreService:GetDataStore("mutes")
+	local globalMuteDataStore = DSS:GetDataStore("mutes")
 	local channel = chatService:GetChannel("All")
 	
 	local userID
@@ -6892,7 +7008,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 	
@@ -6905,7 +7021,7 @@ function module:Run(request)
 	end)
 
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 	
@@ -6925,7 +7041,7 @@ function module:Run(request)
 		MessageService:PublishAsync("Info", publishData)
 	end
 
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully muted this user from the game's chat")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully muted this user from the game's chat")
 end
 
 return module]]></ProtectedString>
@@ -6933,18 +7049,30 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX7105FA83018440E5A2E2FB918950C337">
+		<Item class="ModuleScript" referent="RBXDB60685F126F4F1DA279CA76A827D08D">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">SetReason</string>
-				<string name="ScriptGuid">{D74D1EB1-B79F-4223-B0B0-E36D6CBE01BB}</string>
+				<string name="ScriptGuid">{D371E7E7-B524-4482-8105-FA7E0174C7E9}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
-	local dataStoreService = game:GetService("DataStoreService")
-	local globalBanDataStore = dataStoreService:GetDataStore("bans")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
+	local globalBanDataStore = DSS:GetDataStore("bans")
 	
 	local userID
 
@@ -6953,7 +7081,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 	
@@ -6964,7 +7092,7 @@ function module:Run(request)
 	end)
 	
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 	
@@ -6975,7 +7103,7 @@ function module:Run(request)
 	end
 	
 	if banData.isBanned == false then
-		require(script.Parent.Components.SendResponse):Send("false", "This user isn't banned")
+		require(script.Parent.Components.SendResponse):Send(request, "false", "This user isn't banned")
 	end
 	
 	banData.reason = request.newReason
@@ -6986,11 +7114,11 @@ function module:Run(request)
 	end)
 
 	if e3 then
-		require(script.Parent.Components.SendResponse):Send("false", e3)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e3)
 		return
 	end
 	
-	require(script.Parent.Components.SendResponse):Send("true", "I have successfully updated this user's ban reason")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I have successfully updated this user's ban reason")
 end
 
 return module]]></ProtectedString>
@@ -6998,17 +7126,28 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX5866B1F520664D93B9CB61D01986CEE9">
+		<Item class="ModuleScript" referent="RBXFC8F70E0B10F4508A0E1498686142DF0">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Shutdown</string>
-				<string name="ScriptGuid">{B4AB738E-D243-489A-9328-9CF91549627C}</string>
+				<string name="ScriptGuid">{9A9E6881-19A2-4810-AB23-B39048FCB57E}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
-	local MessageService = game:GetService("MessagingService")
 	local players = game:GetService("Players"):GetPlayers()
+
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
 
 	local status = request.isGlobal
 
@@ -7027,7 +7166,7 @@ function module:Run(request)
 		}
 
 		MessageService:PublishAsync("Info", publishData)
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully made all the servers shutdown")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully made all the servers shutdown")
 	end
 
 	if status == false then
@@ -7040,7 +7179,7 @@ function module:Run(request)
 			v:Kick(kickMessage)
 		end
 
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully made the server with the job id supplied shutdown")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully made the server with the job id supplied shutdown")
 	end
 end
 
@@ -7049,18 +7188,30 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX58BF7EB110F6437796B887ABB2BF1114">
+		<Item class="ModuleScript" referent="RBXBBCBDA6B2893416083D40FC0B91A28A3">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Unban</string>
-				<string name="ScriptGuid">{67C53855-3CA6-4F2A-8EB6-4A484BAFB853}</string>
+				<string name="ScriptGuid">{F73EA627-BBC2-4EB5-972E-5F53F841CDCB}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
-	local dataStoreService = game:GetService("DataStoreService")
-	local globalBanDataStore = dataStoreService:GetDataStore("bans")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
+	local globalBanDataStore = DSS:GetDataStore("bans")
 
 	local userID
 
@@ -7069,7 +7220,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 
@@ -7078,13 +7229,13 @@ function module:Run(request)
 	end)
 
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 
 	_G.request = request
 
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully unbanned this user from the game")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully unbanned this user from the game")
 end
 
 return module]]></ProtectedString>
@@ -7092,17 +7243,27 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX5B06751C765C4395A12324D70871C44A">
+		<Item class="ModuleScript" referent="RBX250900156A7042BD947CA062548E8354">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Unlock</string>
-				<string name="ScriptGuid">{41E8BC39-F3FC-49A7-8CE0-F3CB875D2A2C}</string>
+				<string name="ScriptGuid">{6A3D91C3-74CB-4D8D-A32D-92B6744666EF}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
-	local MessageService = game:GetService("MessagingService")
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
 
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 	local status = request.isGlobal
 
 	if status == true then
@@ -7116,7 +7277,7 @@ function module:Run(request)
 		}
 
 		MessageService:PublishAsync("Info", publishData)
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully unlocked all the servers in the game")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully unlocked all the servers in the game")
 	end
 
 	if status == false then
@@ -7126,7 +7287,7 @@ function module:Run(request)
 
 		_G.lockData = nil
 
-		require(script.Parent.Components.SendResponse):Send("true", "I've successfully unlocked the server with the job id supplied")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully unlocked the server with the job id supplied")
 	end
 end
 
@@ -7135,22 +7296,32 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXA7886DAC83C34FB19ADD5924ABA7465E">
+		<Item class="ModuleScript" referent="RBX331479B0CEC542899F346434029FC463">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">Unmute</string>
-				<string name="ScriptGuid">{9B840B4E-0CD7-47F7-9D3A-7E172664BDAB}</string>
+				<string name="ScriptGuid">{DE174CAE-9514-4830-9CD5-0DD2BFB912E7}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 	local players = game:GetService("Players")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
 	local MessageService = game:GetService("MessagingService")
-	local dataStoreService = game:GetService("DataStoreService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
 
 	local chatService = require(game:GetService("ServerScriptService"):WaitForChild("ChatServiceRunner"):WaitForChild("ChatService"))
 
-	local globalMuteDataStore = dataStoreService:GetDataStore("mutes")
+	local globalMuteDataStore = DSS:GetDataStore("mutes")
 	local channel = chatService:GetChannel("All")
 
 	local userID
@@ -7160,7 +7331,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 
@@ -7169,7 +7340,7 @@ function module:Run(request)
 	end)
 
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 
@@ -7187,7 +7358,7 @@ function module:Run(request)
 		MessageService:PublishAsync("Info", publishData)
 	end
 
-	require(script.Parent.Components.SendResponse):Send("true", "I've successfully unmuted this user from the game's chat")
+	require(script.Parent.Components.SendResponse):Send(request, "true", "I've successfully unmuted this user from the game's chat")
 end
 
 return module]]></ProtectedString>
@@ -7195,20 +7366,31 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXC9EA0BD6B9B94B5680115A31DE994814">
+		<Item class="ModuleScript" referent="RBXFE249A02AAFD4C3FAB794C4C048D9E14">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">GetPlayerJobId</string>
-				<string name="ScriptGuid">{F608FF09-5DC9-4646-9E86-68B81D5BE4BB}</string>
+				<string name="ScriptGuid">{04CDC944-4E0A-4C15-90A5-A927AEA2E625}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
-	local messagingService = game:GetService("MessagingService")
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
 	local players = game:GetService("Players")
 	
 	if players:FindFirstChild(request.userToCheck) then
-		require(script.Parent.Components.SendResponse):Send("true", game.JobId)
+		require(script.Parent.Components.SendResponse):Send(request, "true", game.JobId)
 	else
 		
 		local publishData = {
@@ -7216,7 +7398,7 @@ function module:Run(request)
 			request = request
 		}
 		
-		messagingService:PublishAsync("Info", publishData)
+		MessageService:PublishAsync("Info", publishData)
 	end
 end
 
@@ -7225,19 +7407,31 @@ return module]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX62C32C550FCA4231B9DA73B81D2A44A3">
+		<Item class="ModuleScript" referent="RBX900004FC80FF4E27B3CB7622C7265B99">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">CheckMute</string>
-				<string name="ScriptGuid">{D4CB1D4F-B9BA-457B-A055-2D54D403A35B}</string>
+				<string name="ScriptGuid">{EDAA1229-3000-4B16-96F7-000C4F4CA812}</string>
 				<ProtectedString name="Source"><![CDATA[local module = {}
 
 function module:Run(request)
 
 	local players = game:GetService("Players")
-	local dataStoreService = game:GetService("DataStoreService")
-	local globalBanDataStore = dataStoreService:GetDataStore("mutes")
+	
+	local RunService = game:GetService("RunService");
+	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+
+	local MessageService = game:GetService("MessagingService")
+	local DSS = game:GetService("DataStoreService")
+
+	if (RunService:IsStudio()) then
+		MessageService = MockMessagingService;
+		DSS = MockDataStoreService;
+	end
+	
+	local globalBanDataStore = DSS:GetDataStore("mutes")
 
 	local userID
 
@@ -7246,7 +7440,7 @@ function module:Run(request)
 	end)
 
 	if e then
-		require(script.Parent.Components.SendResponse):Send("false", e)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e)
 		return
 	end
 
@@ -7257,14 +7451,14 @@ function module:Run(request)
 	end)
 
 	if e2 then
-		require(script.Parent.Components.SendResponse):Send("false", e2)
+		require(script.Parent.Components.SendResponse):Send(request, "false", e2)
 		return
 	end
 
 	if muteData == nil or muteData.isMuted == false then
-		require(script.Parent.Components.SendResponse):Send("true", "This user isn't muted")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "This user isn't muted")
 	else
-		require(script.Parent.Components.SendResponse):Send("true", "This user is muted")
+		require(script.Parent.Components.SendResponse):Send(request, "true", "This user is muted")
 	end
 end
 
