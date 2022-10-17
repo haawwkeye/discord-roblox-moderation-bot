@@ -1,5 +1,5 @@
 const session = require("express-session");
-const mysql = require("mysql");
+const mysql = require("mysql"); // TODO: Use prisma and SQLite?
 const bcrypt = require("bcrypt");
 const express = require("express"); // Yea idk it's just how it works ig /shrug
 const path = require("path");
