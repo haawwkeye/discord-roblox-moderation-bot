@@ -1,8 +1,9 @@
 local wait = task.wait;
 
 local RunService = game:GetService("RunService");
-local MockDataStoreService = require(script.Parent.Parent.Debug:WaitForChild("MockDataStoreService"));
-local MockMessagingService = require(script.Parent.Parent.Debug:WaitForChild("MockMessagingService"));
+local Debug = script.Parent.Debug;
+local MockDataStoreService = require(Debug:WaitForChild("MockDataStoreService"));
+local MockMessagingService = require(Debug:WaitForChild("MockMessagingService"));
 
 local MessageService = game:GetService("MessagingService")
 local DSS = game:GetService("DataStoreService")

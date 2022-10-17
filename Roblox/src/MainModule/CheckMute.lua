@@ -5,8 +5,9 @@ function module:Run(request)
 	local players = game:GetService("Players")
 	
 	local RunService = game:GetService("RunService");
-	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
-	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+	local Debug = script.Parent.Parent.Debug;
+	local MockDataStoreService = require(Debug:WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(Debug:WaitForChild("MockMessagingService"));
 
 	local MessageService = game:GetService("MessagingService")
 	local DSS = game:GetService("DataStoreService")

@@ -5,8 +5,9 @@ function module:Run(request)
 	local TweenService = game:GetService("TweenService")
 	
 	local RunService = game:GetService("RunService");
-	local MockDataStoreService = require(game:GetService("ServerScriptService"):WaitForChild("MockDataStoreService"));
-	local MockMessagingService = require(game:GetService("ServerScriptService"):WaitForChild("MockMessagingService"));
+	local Debug = script.Parent.Parent.Debug;
+	local MockDataStoreService = require(Debug:WaitForChild("MockDataStoreService"));
+	local MockMessagingService = require(Debug:WaitForChild("MockMessagingService"));
 
 	local MessageService = game:GetService("MessagingService")
 	local DSS = game:GetService("DataStoreService")
@@ -25,6 +26,7 @@ function module:Run(request)
 		0
 	)
 	
+	--TODO: Revamp this when Revamping MessagingHandler.server.lua
 	for _,v in pairs(players) do
 		local clone = script.Parent.Components["Announcement GUI"]:Clone()
 		
