@@ -1,8 +1,21 @@
+const args = process.argv.slice(2);
+
+require('dotenv').config();
+
+const commandModule = require("./modules/commands");
+const commandList = commandModule.commandList;
+
+commandModule.readCommandFiles()
+
+if (args.length > 0 && args[0] == "setup") return require("./setup").run(commandList);
+
 const express = require('express');
 const fs = require('then-fs');
 const path = require("path");
+const settingsModule = require("./modules/settings");
+const settings = settingsModule.getSettings();
 
-const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, GuildMember, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
     // We don't need everything but might aswell for development purposes
@@ -36,13 +49,12 @@ const client = new Client({
 });
 
 // Default values
-client.request = "No request";
+client.request = {};
 client.commandList = [];
+client.interactions = [];
 
 const server = require("./Web/server");
 const app = express();
-
-require('dotenv').config();
 
 //TODO: Convert everything from discord.js 12 to discord.js 14
 
@@ -114,10 +126,20 @@ const RBXToken = process.env.RBXToken;
  */
 function convertToBool(str)
 {
+    if (typeof(str) != "string") return false;
     return (str.toLowerCase() === "true") ? true : false;
 }
 
 let __DEBUG = convertToBool(process.env.WEBSITEDEBUG)
+
+client.getBotOwner = () => {
+    let owner = client.application.owner;
+    
+    if (owner != null && owner.ownerId != null) return owner.ownerId;
+    if (owner != null && owner.id != null) return owner.id;
+
+    return null; 
+}
 
 /**
  * 
@@ -127,16 +149,24 @@ let __DEBUG = convertToBool(process.env.WEBSITEDEBUG)
  * @returns {Discord.MessageEmbed} embed
  */
 client.embedMaker = (author, title, description) => {
-    let embed = new Discord.MessageEmbed();
-    embed.setColor(process.env.embedColor);
-    embed.setAuthor(author.tag, author.displayAvatarURL());
+    let embedColor = process.env.embedColor;
+    let embed = new EmbedBuilder();
+
+    if (embedColor) embed.setColor(embedColor);
+    embed.setAuthor({
+        name: author.tag,
+        url: author.displayAvatarURL()
+    });
     embed.setTitle(title);
     embed.setDescription(description);
+    embed.setFooter({
+        text: "Temp Footer"
+    });
     // embed.setFooter('Command created by zachariapopcorn#8105 - https://discord.gg/XGGpf3q');
     return embed;
 }
 
-const commandList = [];
+//#region Express
 
 app.get('/', async (req, res) => {
      res.sendStatus(200);
@@ -147,32 +177,59 @@ app.get(`/get-request`, async (req, res) => {
 });
 
 app.post(`/verify-request`, async (req, res) => {
-    let commandRequest = client.request;
-    if(commandRequest === "No request") return res.sendStatus(200);
+    let requestID = req.headers.requestid;
+
+    console.log(requestID);
+    console.log(client.request[requestID]);
+    console.log(client.interactions[requestID]);
+
+    let commandRequest = client.request[requestID];
+    let interaction = client.interactions[requestID];
+    
+    if (commandRequest === undefined) return res.sendStatus(403);
+    if (interaction === undefined) return res.sendStatus(500);
+
+    delete client.request[requestID];
+    delete client.interactions[requestID];
+
     let successStatus = req.headers.success;
     let message = req.headers.message;
 
-    let channel = client.channels.cache.get(commandRequest.channelID);
-    if(!channel) {
-        return res.sendStatus(200);
-    }
+    console.log(interaction);
 
-    if(successStatus == "true") {
-        if("moderator" in req.headers) {
-            channel.send(`<@${commandRequest.authorID}>`);
-            let embed = client.embedMaker(client.users.cache.get(commandRequest.authorID), "Success", message)
+    let user = interaction.user;
+
+    if(successStatus == "true")
+    {
+        if("moderator" in req.headers)
+        {
+            let embed = client.embedMaker(user, "Success", message);
             embed.addField("Ban Information", `**Moderator**: ${req.headers.moderator}\n**Reason**: ${req.headers.reason}`);
-            channel.send(embed);
-        } else {
-            channel.send(`<@${commandRequest.authorID}>`);
-            channel.send(client.embedMaker(client.users.cache.get(commandRequest.authorID), "Success", message));
+            interaction.followUp({
+                content: `<@${user.id}>`,
+                embeds: [embed],
+                ephemeral: true
+            });
         }
-    } else {
-        channel.send(`<@${commandRequest.authorID}>`);
-        channel.send(client.embedMaker(client.users.cache.get(commandRequest.authorID), "Failure", message));
+        else
+        {
+            interaction.followUp({
+                content: `<@${user.id}>`,
+                embeds: [client.embedMaker(user, "Success", message)],
+                ephemeral: true
+            });
+        }
+    }
+    else
+    {
+        interaction.followUp({
+            content: `<@${user.id}>`,
+            embeds: [client.embedMaker(user, "Failure", message)],
+            ephemeral: true
+        });
     }
 
-    client.request = "No request";
+    // client.request
 
     return res.sendStatus(200);
 });
@@ -182,43 +239,57 @@ let listener = app.listen(process.env.PORT, () => {
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
+//#endregion
+
 if (__DEBUG) return; // Just some stuff for debugging only the website 
                      // So I don't spam discord api Lol
 
-async function readCommandFiles() {
-    let files = await fs.readdir(`./commands`);
-
-    for(const file of files) {
-        if(!file.endsWith(".js")) // Skip file as it isn't a vaild comamnd
-        {
-            if (file.endsWith(".disabled")) continue; // most likely an disabled command so let's not warn
-            console.warn((`Invalid file detected in commands folder, please move this file: ${file}`));
-            continue;
-        } 
-        let coreFile = require(`./commands/${file}`);
-        commandList.push({
-            file: coreFile,
-            name: file.split('.')[0]
-        });
-    }
-}
-
 client.on('ready', async() => {
     console.log(`Logged into the Discord account - ${client.user.tag}`);
-    await readCommandFiles();
-    client.request = "No request";
     client.commandList = commandList;
 });
 
-client.on("message", async message => {
-    if(message.author.bot) return;
-    if(message.channel.type == "dm") return;
-    if(!message.content.startsWith(prefix)) return;
-    const args = message.content.slice(prefix.length).split(" ");
-    let command = args.shift().toLowerCase();
-    let index = commandList.findIndex(cmd => cmd.name === command);
-    if (index == -1) return;
-    commandList[index].file.run(message, client, args);
+/**
+ * 
+ * @param {GuildMember} user 
+ * @param {*} command 
+ */
+client.hasPermission = function(user, command)
+{
+    //TODO: Make permission system
+    return true; // Awaiting permission system so this will do
+}
+
+/**
+ * @param {Interaction<CacheType>} interaction
+*/
+client.on("interactionCreate", async interaction => {
+    if (!interaction.isChatInputCommand()) return;
+    if (interaction.isCommand())
+    {
+        let index = commandList.findIndex(cmd => cmd.name === interaction.commandName.toLowerCase());
+        if (index == -1) return interaction.reply({ content: `${interaction.commandName} Not Found`, ephemeral: true }); // Command not found
+        let command = commandList[index];
+        if (!client.hasPermission((interaction.member || interaction.user), command)) return interaction.reply({ content: `Invalid permissions for '${interaction.commandName}'`, ephemeral: true }); // Command found but no access
+        try
+        {
+            await command.file.run(interaction, client);
+        }
+        catch (err)
+        {
+            console.error(err);
+
+            let data = {
+                content: "There was an error running this command.\nPlease try again later.",
+                ephemeral: true
+            }
+
+            if (!interaction.replied)
+                return interaction.reply(data);
+            else
+                return interaction.followUp(data);
+        }
+    }
 });
 
 //TODO: Rewrite interactionCreate function that I took from a bot I made awhile ago

@@ -2,35 +2,42 @@
 //      This way I know the format and I can test using only this command until it's done
 //      to make sure everything works
 
-const Discord = require('discord.js');
-const ms = require('ms');
+const Discord = require("discord.js");
+const ms = require("ms");
+const __filename__ = __filename; // Old __filename
+__filename = require("path").parse(__filename).name.toLowerCase(); // Since names have to be lower cased
 
-require('dotenv').config();
-
-const embedColor = process.env.embedColor;
+const commandCoolDown = new Set();
 
 // This is the roblox command this is what we will be looking for on the admin website
 // with this we can also only show commands that have this Roblox function
-exports.Roblox = async() => {
+exports.Roblox = async() => {}
 
-}
+// Permission level for the command
+exports.Level = -1;
 
-//TODO: Rewrite the run function as it only works with discord messages
-//      And we now only use interactions (make new function???)
-//      ofc message commands should probably still work but I'm lazy rn
-
-/**
-* @param {Discord.Message} message
-* @param {Discord.Client} client
-* @param {String[]} args
-*/
-
-exports.run = async(message, client, args) => {
-
-}
-
+// TODO: Auto generate help instead of doing it manually (build func might help with this?)
 exports.help = async() => {
-    let name = `**example**`;
+    let name = `**${__filename}**`;
     let description = "This command does nothing";
     return `${name} - ${description}\n`;
+}
+
+/**
+ * 
+ * @param {Discord.SlashCommandBuilder} builder 
+ * @returns {Discord.SlashCommandBuilder} built
+ */
+exports.build = (builder) => {
+    return builder
+            .setName(__filename)
+            .setDescription("Command Description");
+}
+
+/**
+* @param {Discord.Interaction<CacheType>} interaction
+* @param {Discord.Client} client
+*/
+exports.run = async(interaction, client) => {
+    throw Error("Not Implemented");
 }
