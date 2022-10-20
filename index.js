@@ -55,6 +55,7 @@ client.interactions = [];
 
 const server = require("./Web/server");
 const app = express();
+const http = require('http').Server(app);
 
 //TODO: Convert everything from discord.js 12 to discord.js 14
 
@@ -234,8 +235,8 @@ app.post(`/verify-request`, async (req, res) => {
     return res.sendStatus(200);
 });
 
-let listener = app.listen(process.env.PORT, () => {
-    server(app);
+let listener = http.listen(process.env.PORT, () => {
+    server(app, http);
     console.log(`Your app is currently listening on port: ${listener.address().port}`);
 });
 
