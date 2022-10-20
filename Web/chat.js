@@ -22,6 +22,8 @@ module.exports = (app, http, sessionMiddleware, users) => {
     //      This way we don't have to deal with permissions being wrong (or a deleted user)
     //TODO: Handle deleted users aswell as maybe adding an option to save to database???
 
+    if (!fs.existsSync(__dirname + "/data/")) fs.mkdirSync(__dirname + "/data/");
+
     let publicName = __dirname + "/data/Messages.json";
     let privateName = __dirname + "/data/PrivateMessages.json";
 
