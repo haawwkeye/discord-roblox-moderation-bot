@@ -2,6 +2,7 @@
  * @param {express.Application} app
  */
 module.exports = (app, http, sessionMiddleware, users) => {
+    const fs = require("fs");
     const io = require("socket.io")(http);
 
     io.use(sessionMiddleware);
@@ -16,20 +17,39 @@ module.exports = (app, http, sessionMiddleware, users) => {
     });
 
     // Chatroom
+    
+    //TODO: When saving chat and all that ONLY save UserId and Message
+    //      This way we don't have to deal with permissions being wrong (or a deleted user)
+    //TODO: Handle deleted users aswell as maybe adding an option to save to database???
 
-    let messages = [];
-    let privateMessages = [];
+    let publicName = __dirname + "/data/Messages.json";
+    let privateName = __dirname + "/data/PrivateMessages.json";
 
+    if (!fs.existsSync(publicName)) fs.writeFileSync(publicName, "[]");
+    if (!fs.existsSync(privateName)) fs.writeFileSync(privateName, "[]");
+
+    let publicData = JSON.parse(fs.readFileSync(publicName));
+    let privateData = JSON.parse(fs.readFileSync(privateName));
+
+    if (typeof(publicData) != "object") fs.writeFileSync(publicName, "[]");
+    if (typeof(privateData) != "object") fs.writeFileSync(privateName, "[]");
+
+    let messages = typeof(publicData) === "object" ? publicData : [];
+    let privateMessages = typeof(privateData) === "object" ? privateData : [];
+
+    //TODO: Change how save and get works
     function saveMessage(data)
     {
         console.log(data);
         if (!data.toUserId && !data.fromUserId)
         {
             messages.push(data);
+            fs.writeFileSync(publicName, JSON.stringify(messages, null, "\t"));
         }
         else
         {
             privateMessages.push(data);
+            fs.writeFileSync(privateName, JSON.stringify(privateMessages, null, "\t"));
         }
     }
 
@@ -44,6 +64,9 @@ module.exports = (app, http, sessionMiddleware, users) => {
 
     let numUsers = 0;
 
+    //TODO: Revamp this as one it's from an example and two we should only use UserId
+    //      Aswell as whatever else is needed for that event (like message, toUser, etc...)
+    //      Maybe add encryption? but probably won't (atleast for private public is probably fine without)
     io.on('connection', (socket) => {
         const session = socket.request.session;
         let addedUser = false;
@@ -73,7 +96,6 @@ module.exports = (app, http, sessionMiddleware, users) => {
 
         // when the client emits 'private message', this listens and executes
         socket.on('private message', (data) => {
-            data.UserId = session.UserId;
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
@@ -82,11 +104,11 @@ module.exports = (app, http, sessionMiddleware, users) => {
                 IsAdmin: session.IsAdmin,
                 //TEMP
                 toUserId: data.toUserId,
-                fromUserId: data.fromUserId,
+                fromUserId: data.UserId,
                 message: data.message
             });
             // we tell the client to execute 'new message'
-            socket.to(data.toUserId).to(data.fromUserId).emit('private message', {
+            socket.to(data.toUserId).to(data.UserId).emit('private message', {
                 UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
@@ -115,6 +137,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
             });
             // echo globally (all clients) that a person has connected
             socket.broadcast.emit('user joined', {
+                UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
@@ -125,6 +148,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
         // when the client emits 'typing', we broadcast it to others
         socket.on('typing', () => {
             socket.broadcast.emit('typing', {
+                UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
@@ -134,6 +158,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
         // when the client emits 'stop typing', we broadcast it to others
         socket.on('stop typing', () => {
             socket.broadcast.emit('stop typing', {
+                UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
@@ -148,6 +173,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
 
                 // echo globally that this client has left
                 socket.broadcast.emit('user left', {
+                    UserId: session.UserId,
                     Username: session.Username,
                     PermissionLevel: session.PermissionLevel,
                     IsAdmin: session.IsAdmin,
