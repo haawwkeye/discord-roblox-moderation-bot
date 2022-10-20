@@ -5,6 +5,18 @@ module.exports = (app, http, sessionMiddleware, users) => {
     const fs = require("fs");
     const io = require("socket.io")(http);
 
+    //TODO: Rewrite server and client code for io as most of it is stolen from
+    //      https://github.com/socketio/socket.io/tree/master/examples/
+    //      It should be fine to take it from examples but at the same time at some point
+    //      I should probably rewrite it instead of copy paste and not knowing what it does
+    //      Either way it WORKS for now ima change it later on probably when the bot/web is done
+    //      AKA revamp EVERYTHING once the bot and website work at the same time
+    //      That way I don't have to revamp just this I can revamp the whole system from v1 to v2
+    //      or ig v2 to v3 for the bot Lol
+
+    //TL;DR
+    //TODO: Rewrite the whole system at some point (most likely after everything works)
+
     io.use(sessionMiddleware);
 
     io.use((socket, next) => {
