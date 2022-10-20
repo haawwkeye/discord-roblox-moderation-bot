@@ -18,6 +18,7 @@ const path = require("path");
 //      Then we just take the list and remove the session Ids then just send that shouldn't be too hard
 
 let users = {};
+let usersInfo = {};
 
 /**
  * @param {String} str
@@ -31,7 +32,28 @@ function convertToBool(str)
 /**
  * @param {express.Application} app
  */
-module.exports = (app) => {
+module.exports = (app, http) => {
+    // Moved since socket.io requires the middleware aswell
+
+    //TODO: Test replacement for session.MemoryStore
+    const sess = new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    });
+
+    const sessionMiddleware = session({
+        cookie: { maxAge: 86400000 },
+        store: sess,
+        resave: false,
+        saveUninitialized: true, // I should probably find out what this does
+        secret: "secret",
+    });
+
+    app.use(sessionMiddleware);
+
+    const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
+    require("./chat.js")(app, http, wrap(sessionMiddleware), users)
+
     if (!convertToBool(process.env.enableAdminWebsite)) return; // WEBSITE DISABLED
     let dbEnabled = convertToBool(process.env.dbEnabled);
     let hashed    = convertToBool(process.env.hashed);
@@ -64,19 +86,6 @@ module.exports = (app) => {
         });
     }
 
-    //TODO: Test replacement for session.MemoryStore
-    const sess = new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
-    });
-
-    app.use(session({
-        cookie: { maxAge: 86400000 },
-        store: sess,
-        resave: false,
-        saveUninitialized: true, // I should probably find out what this does
-        secret: "secret",
-    }));
-    
     // Too lazy to add fatal detection on this but it should be fine?
     app.use("/css", express.static("Web/CSS"))
     app.use("/img", express.static("Web/Images"))
@@ -111,18 +120,14 @@ module.exports = (app) => {
     app.get("/api/userInfo", (req, res) => {
         if (fatal) return res.sendStatus(500);
         let user = req.session;
-        if (user != null && user.LoggedIn) res.status(200).send({
-            Username: user.Username,
-            PermissionLevel: user.PermissionLevel,
-            IsAdmin: user.IsAdmin
-        });
+        if (user != null && user.LoggedIn) res.status(200).send(usersInfo[user.UserId]);
         else res.status(403).send("You must be signed in to access this.")
     })
 
     app.get("/api/users", (req, res) => {
         if (fatal) return res.sendStatus(500);
         let user = req.session;
-        if (user != null && user.LoggedIn) res.status(200).send(users); // Too lazy rn
+        if (user != null && user.LoggedIn) res.status(200).send(usersInfo); // Too lazy rn
         else res.status(403).send("You must be signed in to access this.")
     })
 
@@ -280,8 +285,17 @@ module.exports = (app) => {
                     {
                         if (users[username]) return res.status(403).send(`${username} is already signed in<br>Try again later`)
 
+                        console.log(user);
+
                         users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
+                        usersInfo[user.id] = {
+                            UserId: user.id,
+                            Username: username,
+                            PermissionLevel: user.permissionLevel,
+                            IsAdmin: (user.isAdmin === 1)
+                        }
                         req.session.LoggedIn = true;
+                        req.session.UserId = user.id;
                         req.session.Username = username;
                         req.session.PermissionLevel = user.permissionLevel;
                         req.session.IsAdmin = (user.isAdmin === 1); // bool doesn't work in mysql? so it's an int instead
