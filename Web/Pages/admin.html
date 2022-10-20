@@ -9,6 +9,10 @@
         <script src="/js/admin.js"></script>
     </head>
     <body>
+        <noscript>
+            <strong>We're sorry but this application doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        </noscript>
+
         <h1 id="title">
             Admin Panel
         </h1>
@@ -61,5 +65,15 @@
                 <li class="CommandItem SiteAdmin" data-PermissionLvl="-1">Test</li>
             </ul>
         </div>
+
+        <div id="chat">
+            <div id="chatArea">
+                <ul id="messages"></ul>
+            </div>
+            <input id="chatInput" placeholder="Type here..."/>
+            <script src="/socket.io/socket.io.js"></script>
+            <script src="/js/chatMain.js"></script>
+        </div>
+
     </body>
 </html>
