@@ -23,9 +23,9 @@ const escapeHtml = (unsafe) => {
     return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/>/g, "&gt;");
+        // .replace(/"/g, "&quot;")
+        // .replace(/'/g, "&#039;");
 }
 
 /*
@@ -95,16 +95,18 @@ function alert(type, msg) {
 
 let userInfo;
 
+function getRank(user)
+{
+    if (typeof(user) != "object") user = {PermissionLevel: -99};
+    let rankName = rankings[user.PermissionLevel];
+    if (user.PermissionLevel > 6) rankName = rankings[6]; else if (rankName == null) rankName = "NONE";
+    let userRank = rankName.toUpperCase();
+    return userRank;
+}
+
 async function genUserList(users) {
     let list = "";
     // let i = 0;
-
-    const getRank = (user) => {
-        let rankName = rankings[user.PermissionLevel];
-        if (user.PermissionLevel > 6) rankName = rankings[6]; else if (rankName == null) rankName = "NONE";
-        let userRank = rankName.toUpperCase();
-        return userRank;
-    }
 
     const genRanks = (user) => {
         if (typeof(user) != "object") return `<a class="Rank" data-rank="NONE">[NONE]</a> `
@@ -255,8 +257,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             userHtml.innerHTML = "N/A";
             infoElem.appendChild(userHtml);
         }
+
+        startChat();
     } catch (error) {
+        if (typeof(error) == "object" && error.responseText) {
+            alert(error.responseText)
+        }
+        else alert(error);
+        
         console.error(error);
-        alert(error);
     }
 });
