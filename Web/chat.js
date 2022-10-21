@@ -20,7 +20,8 @@ module.exports = (app, http, sessionMiddleware, users) => {
     io.use(sessionMiddleware);
 
     io.use((socket, next) => {
-        const session = socket.request.session;
+        let isSelf = socket.request.headers.host === `localhost:${process.env.PORT}` && socket.request.headers.auth;
+        const session = isSelf ? JSON.parse(socket.request.headers.auth) : socket.request.session;
         if (session && session.LoggedIn) {
             next();
         } else {
@@ -82,10 +83,11 @@ module.exports = (app, http, sessionMiddleware, users) => {
     //      Aswell as whatever else is needed for that event (like message, toUser, etc...)
     //      Maybe add encryption? but probably won't (atleast for private public is probably fine without)
     io.on('connection', (socket) => {
-        const session = socket.request.session;
+        let isSelf = socket.request.headers.host === `localhost:${process.env.PORT}` && socket.request.headers.auth;
+        const session = isSelf ? JSON.parse(socket.request.headers.auth) : socket.request.session;
         let addedUser = false;
 
-        console.log(session);
+        // console.log(session);
 
         // when the client emits 'new message', this listens and executes
         socket.on('new message', (data) => {
@@ -142,7 +144,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
                 privateMessages: getPrivateMessages(session)
             }
 
-            console.log(data);
+            // console.log(data);
 
             socket.emit('login', {
                 numUsers: numUsers,
@@ -196,4 +198,6 @@ module.exports = (app, http, sessionMiddleware, users) => {
             }
         });
     });
+
+    require("./bot").startBot();
 }
