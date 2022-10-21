@@ -9,20 +9,6 @@ function startChat()
   $(function() {
       const FADE_TIME = 150; // ms
       const TYPING_TIMER_LENGTH = 400; // ms
-      /**
-       * 
-       * @param {String} unsafe 
-       * @returns {String} escaped
-       */
-      const escapeHtml = (unsafe) => {
-        if (typeof(unsafe) != "string") return "";
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-            // .replace(/"/g, "&quot;")
-            // .replace(/'/g, "&#039;");
-      }
     
       // Initialize variables
       const $window = $(window);
@@ -41,9 +27,9 @@ function startChat()
       const addParticipantsMessage = (data) => {
         let message = '';
         if (data.numUsers === 1) {
-          message += `there's 1 participant`;
+          message += `there's 1 user online`;
         } else {
-          message += `there are ${data.numUsers} participants`;
+          message += `there's ${data.numUsers} users online`;
         }
         log(message);
       }
@@ -52,7 +38,7 @@ function startChat()
       const sendMessage = () => {
         let message = $inputMessage.val();
         // Prevent markup from being injected into the message
-        message = escapeHtml(message);
+        // message = escapeHtml(message);
         // if there is a non-empty message and a socket connection
         if (message && connected) {
           $inputMessage.val('');
@@ -202,15 +188,11 @@ function startChat()
       socket.on('login', (data) => {
         connected = true;
         // Display the welcome message
-        const message = 'Welcome to Socket.IO Chat – ';
-        log(message, {
-          prepend: true
-        });
-        addParticipantsMessage(data);
         (async () => {
           data.messages.forEach((msgData) => {
             addChatMessage(msgData)
           });
+          addParticipantsMessage(data);
         })();
       });
     
