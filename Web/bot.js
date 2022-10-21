@@ -1,6 +1,7 @@
+exports.bot;
 exports.commands = {
     "help": {
-        run: (self, args) => {
+        run: (args) => {
             let cmds = this.commands;
             let message = "Commands: \n";
             let found = cmds[args[0]];
@@ -19,7 +20,7 @@ exports.commands = {
                 }
             }
             message = message.slice(0, message.length-1);
-            self.emit("new message", message);
+            this.bot.emit("new message", message);
         },
         help: "help - Shows this message"
     }
@@ -28,7 +29,7 @@ exports.commands = {
 exports.startBot = async() => {
     const client = require("socket.io-client");
 
-    const socket = client.io(`http://localhost:${process.env.PORT}`, {
+    this.bot = client.io(`http://localhost:${process.env.PORT}`, {
         autoConnect: true,
         reconnection: true,
 
@@ -50,7 +51,7 @@ exports.startBot = async() => {
         {
             let args = msg.slice(1).split(" ");
             let command = this.commands[args[0]];
-            if (command) command.run(socket, args.slice(1));
+            if (command) command.run(args.slice(1));
             else socket.emit("new message", "Invaild command, Check -help for all commands");
         }
     });
