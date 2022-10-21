@@ -1,4 +1,4 @@
-exports.bot;
+exports.bot = null; // Gets defined later on
 exports.commands = {
     "help": {
         run: (args) => {
