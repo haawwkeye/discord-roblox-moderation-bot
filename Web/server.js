@@ -285,8 +285,6 @@ module.exports = (app, http) => {
                     {
                         if (users[username]) return res.status(403).send(`${username} is already signed in<br>Try again later`)
 
-                        console.log(user);
-
                         users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
                         usersInfo[user.id] = {
                             UserId: user.id,
