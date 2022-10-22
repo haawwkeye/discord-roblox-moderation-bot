@@ -260,10 +260,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         startChat();
     } catch (error) {
-        if (typeof(error) == "object" && error.responseText) {
-            alert(error.responseText)
+        if (typeof(error) == "object" && error.responseText)
+        {
+            alert(4, error.responseText)
         }
-        else alert(error);
+        else alert(4, error);
         
         console.error(error);
     }
