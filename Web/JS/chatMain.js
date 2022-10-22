@@ -22,7 +22,7 @@ function startChat()
       let connected = false;
       let typing = false;
       let lastTypingTime;
-      let $currentInput = $inputMessage.focus();
+      let $currentInput = $inputMessage;
 
       const addParticipantsMessage = (data) => {
         let message = '';
@@ -160,11 +160,13 @@ function startChat()
     
       $window.keydown(event => {
         // Auto-focus the current input when a key is typed
-        if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-          $currentInput.focus();
-        }
+        // removed this as we will end up having more then one input and I don't wanna see if
+        // that works or not Lol
+        // if (!(event.ctrlKey || event.metaKey || event.altKey)) {
+        //   $currentInput.focus();
+        // }
         // When the client hits ENTER on their keyboard
-        if (event.which === 13) {
+        if (event.which === 13 && ($currentInput.is(":focus"))) {
           sendMessage();
           socket.emit('stop typing');
           typing = false;
