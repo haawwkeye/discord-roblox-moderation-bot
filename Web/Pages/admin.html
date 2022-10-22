@@ -66,14 +66,33 @@
             </ul>
         </div>
 
-        <div id="chat">
+        <!--
+            data-room is the id/name of the room that we want to join
+        -->
+        <div id="chat" data-Room="General">
+            <div id="chatTabs">
+                <ul id="tabs">
+                    <li class="tab selected" data-Room="General"><a>General</a></li>
+                    <li class="tab" data-Room="0"><a>Bot</a></li>
+                    <!--
+                        Anything after this will most likely be auto generated
+                        can't really do much the most I can do is add the bot and auto gen after
+                        Since the bot has an id of 0 (1 is the lowest userid or should be)
+                        so the bot will never change besides maybe the username/perms /shrug
+                    -->
+                </ul>
+            </div>
+            <hr style="position: absolute; top: 35px; height: 0px; width: 298px;">
             <div id="chatArea">
                 <ul id="messages"></ul>
             </div>
+            <hr style="position: absolute; bottom: 25px; height: 0px; width: 298px;">
             <input id="chatInput" placeholder="Type here..."/>
+            <!--
+                Scripts for the chat system
+            -->
             <script src="/socket.io/socket.io.js"></script>
             <script src="/js/chatMain.js"></script>
         </div>
-
     </body>
 </html>
