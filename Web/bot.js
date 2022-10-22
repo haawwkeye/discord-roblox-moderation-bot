@@ -1,35 +1,55 @@
-exports.bot = null; // Gets defined later on
+exports.bot = {
+    User: null,
+    sendPublicMsg: (msg) => {
+        this.bot.User.emit("new message", msg);
+    },
+    sendPrivateMsg: (msg, uid) => {
+        this.bot.User.emit("private message", {
+            UserId: 0, // Is this even needed? /shrug
+            toUserId: uid,
+            message: msg
+        });
+    },
+}; // Gets defined later on
 exports.commands = {
     "help": {
-        run: (args) => {
+        run: (args, sendMsg) => {
             let cmds = this.commands;
             let message = "Commands: \n";
             let found = cmds[args[0]];
 
-            if (found != null && found.help != null) message = found.help + "\n";
+            //TODO: find out how to format this
+            function fetchHelp(cmd)
+            {
+                return `${cmd.siteAdmin ? "(SITE ADMIN ONLY)" : ""} ${cmd.help}`
+            }
+
+            if (found != null && found.help != null) message = fetchHelp(found) + "\n";
             else
             {
                 for (const i in cmds)
                 {
                     if (Object.hasOwnProperty.call(cmds, i)) {
                         const cmd = cmds[i];
-                        console.log(cmd);
-                        message += cmd.help + "\n";
+                        message += fetchHelp(cmd) + "\n";
                         
                     }
                 }
             }
             message = message.slice(0, message.length-1);
-            this.bot.emit("new message", message);
+            sendMsg("new message", message);
         },
-        help: "help - Shows this message"
+        help: "help - Shows this message",
+        siteAdmin: false,
+        perm: -1
     }
 }
 
 exports.startBot = async() => {
     const client = require("socket.io-client");
+    const url = `http://localhost:${process.env.PORT}`
 
-    this.bot = client.io(`http://localhost:${process.env.PORT}`, {
+    this.bot.User = client.io(url, {
         autoConnect: true,
         reconnection: true,
 
@@ -45,18 +65,31 @@ exports.startBot = async() => {
         }
     });
 
-    this.bot.on("new message", (data) => {
+    this.bot.User.on("new message", (data) => {
         let msg = data.message.toLowerCase();
         if (msg.startsWith("-"))
         {
             let args = msg.slice(1).split(" ");
             let command = this.commands[args[0]];
-            if (command) command.run(args.slice(1));
-            else socket.emit("new message", "Invaild command, Check -help for all commands");
+            if (command) command.run(args.slice(1), this.bot.sendPublicMsg);
+            else this.bot.sendPublicMsg("Invaild command, Check -help for all commands");
         }
     });
 
-    this.bot.on("connect", () => {
+    this.bot.User.on("private message", (data) => {
+        let msg = data.message.toLowerCase();
+        if (msg.startsWith("-"))
+        {
+            let args = msg.slice(1).split(" ");
+            let command = this.commands[args[0]];
+            if (command) command.run(args.slice(1), (msg) => {
+                this.bot.sendPrivateMsg(msg, data.UserId);
+            });
+            else this.bot.sendPrivateMsg("Invaild command, Check -help for all commands", data.UserId);
+        }
+    });
+
+    this.bot.User.on("connect", () => {
         console.log("Successfully connected to chat");
     });
 }
