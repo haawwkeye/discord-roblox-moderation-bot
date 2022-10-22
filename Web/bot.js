@@ -45,7 +45,7 @@ exports.startBot = async() => {
         }
     });
 
-    socket.on("new message", (data) => {
+    this.bot.on("new message", (data) => {
         let msg = data.message.toLowerCase();
         if (msg.startsWith("-"))
         {
@@ -56,7 +56,7 @@ exports.startBot = async() => {
         }
     });
 
-    socket.on("connect", () => {
+    this.bot.on("connect", () => {
         console.log("Successfully connected to chat");
     });
 }
