@@ -83,6 +83,8 @@ function startChat(users)
           .text(data.Username + " ");
         const $messageBodyDiv = $('<span class="messageBody">')
           .text(data.message);
+        
+        if (data.UserId === 0) $messageBodyDiv.html($messageBodyDiv.html().replace(/\n/g,'<br/>'));
     
         const typingClass = data.typing ? 'typing' : '';
         const $messageDiv = $('<li class="message"/>')
@@ -225,7 +227,7 @@ function startChat(users)
         });
 
         for (const i in users) {
-          createTab(user[i]);
+          createTab(users[i]);
         }
       })();
 
