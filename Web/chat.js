@@ -72,13 +72,15 @@ module.exports = async (app, http, sessionMiddleware, users) => {
 
     function getPrivateMessages(session, id)
     {
-        let send = []
+        let send = [];
+
         privateMessages.forEach((val) => {
             let isSelf = (val.toUserId === session.UserId || val.fromUserId === session.UserId);
             let isUser = (val.toUserId === id || val.fromUserId === id);
 
             if (id ? isSelf && isUser : isSelf) send.push(val);
-        })
+        });
+        
         return send;
     }
 

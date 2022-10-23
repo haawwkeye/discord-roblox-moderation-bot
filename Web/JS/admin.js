@@ -143,7 +143,7 @@ async function genUserList(users) {
 
 async function getUsers() {
     let div = $("#OnlineUsers")[0]; // get div
-    let users;
+    let users, userList;
     await $.ajax({
         type: "get",
         url: "/api/users",
@@ -154,6 +154,7 @@ async function getUsers() {
                 return console.error(res);
             }
             users = res;
+            userList = res;
         }
     });
 
@@ -161,6 +162,8 @@ async function getUsers() {
     let list = await genUserList(users);
     console.log(list);
     if (div != null) div.innerHTML = list;
+    
+    return userList;
 }
 
 // We want to wait for everything to load before attempting to do any of this since this script is probably at the top of body
@@ -179,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        getUsers();
+        let users = await getUsers();
 
         //TODO: switch to using jquery?
 
@@ -258,7 +261,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             infoElem.appendChild(userHtml);
         }
 
-        startChat();
+        startChat(users);
     } catch (error) {
         if (typeof(error) == "object" && error.responseText)
         {
