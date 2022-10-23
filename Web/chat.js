@@ -130,6 +130,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
         // when the client emits 'new message', this listens and executes
         socket.on('new message', (data) => {
             if (currentRoom != "General") return;
+            let timestamp = new Date().getTime();
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
@@ -137,6 +138,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
                 //TEMP
+                timestamp: timestamp,
                 message: data
             });
             // we tell the client to execute 'new message'
@@ -145,12 +147,14 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
+                timestamp: timestamp,
                 message: data
             });
         });
 
         // when the client emits 'private message', this listens and executes
         socket.on('private message', (data) => {
+            let timestamp = new Date().getTime();
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
@@ -160,6 +164,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 //TEMP
                 toUserId: data.toUserId,
                 fromUserId: data.UserId,
+                timestamp: timestamp,
                 message: data.message
             });
             // we tell the client to execute 'new message'
@@ -171,6 +176,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 IsAdmin: session.IsAdmin,
                 toUserId: data.toUserId,
                 fromUserId: data.UserId,
+                timestamp: timestamp,
                 message: data.message
             });
         });
