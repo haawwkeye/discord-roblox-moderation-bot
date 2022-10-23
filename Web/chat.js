@@ -130,7 +130,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
         // when the client emits 'new message', this listens and executes
         socket.on('new message', (data) => {
             if (currentRoom != "General") return;
-            let timestamp = new Date().getTime();
+            let timestamp = Date.now;
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
@@ -154,7 +154,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
 
         // when the client emits 'private message', this listens and executes
         socket.on('private message', (data) => {
-            let timestamp = new Date().getTime();
+            let timestamp = Date.now;
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
