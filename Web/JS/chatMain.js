@@ -99,7 +99,8 @@ function startChat(users)
       const addChatTyping = (data) => {
         data.typing = true;
         data.message = 'is typing';
-        addChatMessage(data);
+
+        if (data.isGeneral ? currentRoom === "General" : currentRoom != "General") addChatMessage(data);
       }
     
       // Removes the visual chat typing message
@@ -150,7 +151,7 @@ function startChat(users)
         if (connected) {
           if (!typing) {
             typing = true;
-            socket.emit('typing', currentRoom);
+            socket.emit('typing');
           }
           lastTypingTime = (new Date()).getTime();
     
@@ -158,7 +159,7 @@ function startChat(users)
             const typingTimer = (new Date()).getTime();
             const timeDiff = typingTimer - lastTypingTime;
             if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-              socket.emit('stop typing', currentRoom);
+              socket.emit('stop typing');
               typing = false;
             }
           }, TYPING_TIMER_LENGTH);
@@ -226,7 +227,8 @@ function startChat(users)
           addTab(elem);
         });
 
-        for (const i in users) {
+        for (const i in users)
+        {
           createTab(users[i]);
         }
       })();
@@ -241,7 +243,7 @@ function startChat(users)
         // When the client hits ENTER on their keyboard
         if (event.which === 13 && ($currentInput.is(":focus"))) {
           sendMessage();
-          socket.emit('stop typing', currentRoom);
+          socket.emit('stop typing');
           typing = false;
         }
       });
