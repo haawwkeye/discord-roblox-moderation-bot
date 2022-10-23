@@ -1,6 +1,6 @@
 let chatStarted = false;
 
-function startChat()
+function startChat(users)
 {
   if (chatStarted) return;
   chatStarted = true;
@@ -65,7 +65,7 @@ function startChat()
     
       //This clears the chat as you can probably guess...
       const clearChat = () => {
-        return $messages.children().each(function (_, elem) {
+        return $messages.children().each((_, elem) => {
           $(elem).remove();
         });
       }
@@ -179,9 +179,9 @@ function startChat()
     
       // Keyboard events
     
-      let tabs = document.getElementsByClassName("tab");
-      let $currentTab = document.getElementsByClassName("tab active").item(0);
-      if ($currentTab != null) $currentTab = $($currentTab);
+      let chatTabs = $("#tabs");
+      let tabs = chatTabs.children();
+      let $currentTab;
 
       let onTabClicked = (elem) => {
         let tab = $(elem);
@@ -197,9 +197,37 @@ function startChat()
         setRoom($currentTab.data("room"));
       }
 
-      for (const tab of tabs) {
-        tab.onclick = () => {onTabClicked(tab);}
+      function createTab(user)
+      {
+        // when user is set to self it kinda breaks...
+        if (user === null || userInfo.UserId === user.UserId) return;
+
+        let btn = $("<button/>").append(user.Username);
+        let tab = $(`<li class="tab" data-room="${user.UserId}"/>`).append(btn);
+
+        chatTabs.append(tab);
+
+        addTab(tab[0]);
       }
+
+      function addTab(tab)
+      {        
+        tab.onclick = () => {
+          onTabClicked(tab);
+        }
+      }
+
+      (async()=>{
+        tabs.each((_, elem) => {
+          let tab = $(elem);
+          if (tab.hasClass("active")) $currentTab = tab;
+          addTab(elem);
+        });
+
+        for (const i in users) {
+          createTab(user[i]);
+        }
+      })();
 
       $window.keydown(event => {
         // Auto-focus the current input when a key is typed
@@ -258,6 +286,7 @@ function startChat()
     
       // Whenever the server emits 'user joined', log it in the chat body
       socket.on('user joined', (data) => {
+        createTab(data);
         log(`${data.Username} joined`);
         addParticipantsMessage(data);
       });
