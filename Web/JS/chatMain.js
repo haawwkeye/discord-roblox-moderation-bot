@@ -14,6 +14,8 @@ function startChat()
       const $window = $(window);
       const $messages = $('#messages');           // Messages area
       const $inputMessage = $('#chatInput');   // Input message input box
+
+      let currentRoom = "General";
     
       const socket = io();
     
@@ -46,7 +48,12 @@ function startChat()
           newData.message = message;
           addChatMessage(newData);
           // tell server to execute 'new message' and send along one parameter
-          socket.emit('new message', message);
+          if (currentRoom === "General") socket.emit('new message', message);
+          else socket.emit("private message", {
+            UserId: userInfo.UserId,
+            toUserId: currentRoom,
+            message: message
+          });
         }
       }
     
@@ -56,6 +63,13 @@ function startChat()
         addMessageElement($el, options);
       }
     
+      //This clears the chat as you can probably guess...
+      const clearChat = () => {
+        return $messages.children().each(function (_, elem) {
+          $(elem).remove();
+        });
+      }
+
       // Adds the visual chat message to the message list
       const addChatMessage = (data, options = {}) => {
         // Don't fade the message in if there is an 'X was typing'
@@ -134,7 +148,7 @@ function startChat()
         if (connected) {
           if (!typing) {
             typing = true;
-            socket.emit('typing');
+            socket.emit('typing', currentRoom);
           }
           lastTypingTime = (new Date()).getTime();
     
@@ -142,7 +156,7 @@ function startChat()
             const typingTimer = (new Date()).getTime();
             const timeDiff = typingTimer - lastTypingTime;
             if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-              socket.emit('stop typing');
+              socket.emit('stop typing', currentRoom);
               typing = false;
             }
           }, TYPING_TIMER_LENGTH);
@@ -155,9 +169,38 @@ function startChat()
           return $(this).data('username') === data.Username;
         });
       }
+
+      const setRoom = (roomId) => {
+        currentRoom = roomId;
+        // $chat.data("room", roomId);
+        socket.emit("join room", roomId);
+        socket.emit("roomData"); // Get the data for the current room
+      }
     
       // Keyboard events
     
+      let tabs = document.getElementsByClassName("tab");
+      let $currentTab = document.getElementsByClassName("tab active").item(0);
+      if ($currentTab != null) $currentTab = $($currentTab);
+
+      let onTabClicked = (elem) => {
+        let tab = $(elem);
+
+        $currentInput.focus();
+
+        if (tab.hasClass("active")) return;
+        if ($currentTab) $currentTab.removeClass("active");
+        
+        $currentTab = tab;
+        $currentTab.addClass("active");
+        
+        setRoom($currentTab.data("room"));
+      }
+
+      for (const tab of tabs) {
+        tab.onclick = () => {onTabClicked(tab);}
+      }
+
       $window.keydown(event => {
         // Auto-focus the current input when a key is typed
         // removed this as we will end up having more then one input and I don't wanna see if
@@ -168,7 +211,7 @@ function startChat()
         // When the client hits ENTER on their keyboard
         if (event.which === 13 && ($currentInput.is(":focus"))) {
           sendMessage();
-          socket.emit('stop typing');
+          socket.emit('stop typing', currentRoom);
           typing = false;
         }
       });
@@ -187,21 +230,31 @@ function startChat()
       // Socket events
     
       // Whenever the server emits 'login', log the login message
-      socket.on('login', (data) => {
+      socket.on('login', () => {
         connected = true;
-        // Display the welcome message
-        (async () => {
-          data.messages.forEach((msgData) => {
-            addChatMessage(msgData)
-          });
-          addParticipantsMessage(data);
-        })();
+        socket.emit("roomData"); // Get the data for the current room
       });
+
+      socket.on("roomData", (roomData) => {
+        // Display the welcome message
+        // console.log(roomData)
+        (async () => {
+          await clearChat();
+          await roomData.messages.forEach((msgData) => {
+            addChatMessage(msgData);
+          });
+          addParticipantsMessage(roomData);
+        })();
+      })
     
       // Whenever the server emits 'new message', update the chat body
       socket.on('new message', (data) => {
         addChatMessage(data);
       });
+
+      socket.on('private message', (data) => {
+        addChatMessage(data);
+      })
     
       // Whenever the server emits 'user joined', log it in the chat body
       socket.on('user joined', (data) => {
