@@ -1,9 +1,11 @@
 /**
  * @param {express.Application} app
  */
-module.exports = (app, http, sessionMiddleware, users) => {
+module.exports = async (app, http, sessionMiddleware, users) => {
     const fs = require("fs");
     const io = require("socket.io")(http);
+    const bot = require("./bot");
+    let botUser = bot.User ? bot.User : await bot.startBot();
 
     //TODO: Rewrite server and client code for io as most of it is stolen from
     //      https://github.com/socketio/socket.io/tree/master/examples/
@@ -55,7 +57,7 @@ module.exports = (app, http, sessionMiddleware, users) => {
     //TODO: Change how save and get works
     function saveMessage(data)
     {
-        console.log(data);
+        // console.log(data);
         if (!data.toUserId && !data.fromUserId)
         {
             messages.push(data);
@@ -68,11 +70,14 @@ module.exports = (app, http, sessionMiddleware, users) => {
         }
     }
 
-    function getPrivateMessages(session)
+    function getPrivateMessages(session, id)
     {
         let send = []
         privateMessages.forEach((val) => {
-            if (val.toUserId === session.UserId || val.fromUserId === session.UserId) send.push(val);
+            let isSelf = (val.toUserId === session.UserId || val.fromUserId === session.UserId);
+            let isUser = (val.toUserId === id || val.fromUserId === id);
+
+            if (id ? isSelf && isUser : isSelf) send.push(val);
         })
         return send;
     }
@@ -86,11 +91,43 @@ module.exports = (app, http, sessionMiddleware, users) => {
         let isSelf = socket.request.headers.host === `localhost:${process.env.PORT}` && socket.request.headers.auth;
         const session = isSelf ? JSON.parse(socket.request.headers.auth) : socket.request.session;
         let addedUser = false;
+        let currentRoom = "General";
+
+        if (isSelf) {
+            socket.on("botJoin", (data) => {
+                socket.join(data);
+            });
+
+            socket.on("botLeave", (data) => {
+                socket.leave(data);
+            });
+        }
 
         // console.log(session);
 
+        socket.on("roomData", () => {
+            const data = {
+                messages: currentRoom === "General" ? messages : getPrivateMessages(session, currentRoom),
+                numUsers: numUsers //TEMP UNTIL WE CAN GET ROOM USERS
+            }
+            // console.log(data);
+            socket.emit("roomData", data);
+        })
+
+        socket.on("join room", (roomId) => {
+            let lastRoom = currentRoom;
+            currentRoom = roomId;
+            
+            // We can't join/leave the default room
+            if (roomId === "General") return;
+            if (lastRoom != "General") socket.leave(lastRoom);
+
+            socket.join(roomId);
+        });
+
         // when the client emits 'new message', this listens and executes
         socket.on('new message', (data) => {
+            if (currentRoom != "General") return;
             saveMessage({
                 UserId: session.UserId,
                 //TEMP
@@ -124,32 +161,30 @@ module.exports = (app, http, sessionMiddleware, users) => {
                 message: data.message
             });
             // we tell the client to execute 'new message'
+            
             socket.to(data.toUserId).to(data.UserId).emit('private message', {
                 UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
+                toUserId: data.toUserId,
+                fromUserId: data.UserId,
                 message: data.message
             });
         });
 
         // when the client emits 'add user', this listens and executes
         socket.on('add user', () => {
+            botUser.emit("botJoin", session.UserId);
+            
             if (addedUser) return;
             ++numUsers;
             addedUser = true;
-
-            const data = {
-                messages: messages,
-                privateMessages: getPrivateMessages(session)
-            }
 
             // console.log(data);
 
             socket.emit('login', {
                 numUsers: numUsers,
-                messages: data.messages,
-                privateMessages: data.privateMessages
             });
             // echo globally (all clients) that a person has connected
             socket.broadcast.emit('user joined', {
@@ -187,6 +222,8 @@ module.exports = (app, http, sessionMiddleware, users) => {
             {
                 --numUsers;
 
+                botUser.emit("botLeave", session.UserId);
+
                 // echo globally that this client has left
                 socket.broadcast.emit('user left', {
                     UserId: session.UserId,
@@ -198,6 +235,4 @@ module.exports = (app, http, sessionMiddleware, users) => {
             }
         });
     });
-
-    require("./bot").startBot();
 }

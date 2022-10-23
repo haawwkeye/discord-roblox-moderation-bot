@@ -1,5 +1,5 @@
 exports.bot = {
-    User: null,
+    User: null, // Gets defined later on
     sendPublicMsg: (msg) => {
         this.bot.User.emit("new message", msg);
     },
@@ -10,7 +10,8 @@ exports.bot = {
             message: msg
         });
     },
-}; // Gets defined later on
+};
+
 exports.commands = {
     "help": {
         run: (args, sendMsg) => {
@@ -37,7 +38,7 @@ exports.commands = {
                 }
             }
             message = message.slice(0, message.length-1);
-            sendMsg("new message", message);
+            sendMsg(message);
         },
         help: "help - Shows this message",
         siteAdmin: false,
@@ -65,31 +66,31 @@ exports.startBot = async() => {
         }
     });
 
-    this.bot.User.on("new message", (data) => {
-        let msg = data.message.toLowerCase();
-        if (msg.startsWith("-"))
-        {
-            let args = msg.slice(1).split(" ");
-            let command = this.commands[args[0]];
-            if (command) command.run(args.slice(1), this.bot.sendPublicMsg);
-            else this.bot.sendPublicMsg("Invaild command, Check -help for all commands");
-        }
-    });
+    const handleCommand = (data) => {
+        // console.log(data);
 
-    this.bot.User.on("private message", (data) => {
         let msg = data.message.toLowerCase();
         if (msg.startsWith("-"))
         {
+            const sendMsg = (msg) => {
+                if (data.toUserId) this.bot.sendPrivateMsg(msg, data.toUserId);
+                else this.bot.sendPublicMsg(msg);
+            }
+
             let args = msg.slice(1).split(" ");
             let command = this.commands[args[0]];
-            if (command) command.run(args.slice(1), (msg) => {
-                this.bot.sendPrivateMsg(msg, data.UserId);
-            });
-            else this.bot.sendPrivateMsg("Invaild command, Check -help for all commands", data.UserId);
+
+            if (command) command.run(args.slice(1), sendMsg);
+            else sendMsg("Invaild command, Check -help for all commands");
         }
-    });
+    }
+
+    this.bot.User.on("new message", handleCommand);
+    this.bot.User.on("private message", handleCommand);
 
     this.bot.User.on("connect", () => {
         console.log("Successfully connected to chat");
     });
+
+    return this.bot.User;
 }
