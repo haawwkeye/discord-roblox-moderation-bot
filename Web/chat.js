@@ -206,22 +206,40 @@ module.exports = async (app, http, sessionMiddleware, users) => {
 
         // when the client emits 'typing', we broadcast it to others
         socket.on('typing', () => {
-            socket.broadcast.emit('typing', {
+            let isGeneral = (currentRoom === "General");
+
+            const sent = {
                 UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
-            });
+                isGeneral: isGeneral
+            }
+
+            if (isGeneral)
+            {
+                socket.broadcast.emit('typing', sent);
+            }
+            else socket.to(currentRoom).emit('typing', sent)
         });
 
         // when the client emits 'stop typing', we broadcast it to others
         socket.on('stop typing', () => {
-            socket.broadcast.emit('stop typing', {
+            let isGeneral = (currentRoom === "General");
+
+            const sent = {
                 UserId: session.UserId,
                 Username: session.Username,
                 PermissionLevel: session.PermissionLevel,
                 IsAdmin: session.IsAdmin,
-            });
+                isGeneral: isGeneral
+            }
+
+            if (isGeneral)
+            {
+                socket.broadcast.emit('stop typing', sent);
+            }
+            else socket.to(currentRoom).emit('stop typing', sent)
         });
 
         // when the user disconnects.. perform this
