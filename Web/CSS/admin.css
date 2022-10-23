@@ -198,17 +198,29 @@
 }
 
 #tabs .tab {
-    font-weight: bold;
     padding-right: 10px;
+    height: 30px;
+    width: 80px;
+    margin-top: -10px;
+}
+
+#tabs .tab button {
+    height: 100%;
+    width: 100%;
+    /* background-color: inherit; */
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: bold;
     transition: 0.2s;
 }
 
-#tabs .tab.selected {
+#tabs .tab.active button {
     font-weight: bolder;
     text-shadow: 0 0 5px currentColor;
 }
 
-#tabs .tab:not(.selected):hover {
+#tabs .tab:not(.active) button:hover {
     text-shadow: 0 0 5px royalblue;
 }
 
