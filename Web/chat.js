@@ -127,6 +127,15 @@ module.exports = async (app, http, sessionMiddleware, users) => {
             socket.join(roomId);
         });
 
+        //TODO: Fix being able to see messages anywhere when they're supposed to only show up
+        //      In the current Room
+        //      example: have two clients signed in have client 1 stay in any channel
+        //      Then have client 2 open another channel and send any message
+        //      This will then (even tho it's not supposed to) show that one message
+        //      to ALL clients if you leave and rejoin the channel you were just in (client 1)
+        //      The messages will be gone tho maybe it's an issue on the client side?
+        //      Or it's in issue on how I send message to the client /shrug
+
         // when the client emits 'new message', this listens and executes
         socket.on('new message', (data) => {
             if (currentRoom != "General") return;
