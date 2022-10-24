@@ -22,7 +22,7 @@ exports.commands = {
             //TODO: find out how to format this
             function fetchHelp(cmd)
             {
-                return `${cmd.siteAdmin ? "(SITE ADMIN ONLY)" : ""} ${cmd.help}`
+                return `${cmd.help}`
             }
 
             if (found != null && found.help != null) message = fetchHelp(found) + "\n";
@@ -42,6 +42,34 @@ exports.commands = {
         },
         help: "help - Shows this message",
         siteAdmin: false,
+        perm: -1
+    },
+    "dm": {
+        run: (args, sendMsg) => {
+            let uid = args[0];
+            let msg;
+
+            args.forEach((elem, i) => {
+                if (i < 1) return;
+                if (msg === undefined) msg = elem + " ";
+                else msg += elem + " ";
+            });
+
+            if (!uid) return sendMsg(`UserId is an required option.`);
+            if (!msg) return sendMsg(`Message is an required option.`);
+
+            msg.substring(0, msg.length-1);
+
+            try {
+                this.bot.sendPrivateMsg(msg, uid);
+                sendMsg(`Sent message to ${uid}`);
+            } catch (e) {
+                sendMsg(`Failed to send message to ${uid}\n${e}`);
+            }
+            
+        },
+        help: "dm [UserId] [message] - DM's a certain user a certain message",
+        siteAdmin: true,
         perm: -1
     }
 }
@@ -69,7 +97,7 @@ exports.startBot = async() => {
     const handleCommand = (data) => {
         // console.log(data);
 
-        let msg = data.message.toLowerCase();
+        let msg = data.message;
         if (msg.startsWith("-"))
         {
             const sendMsg = (msg) => {
@@ -78,7 +106,7 @@ exports.startBot = async() => {
             }
 
             let args = msg.slice(1).split(" ");
-            let command = this.commands[args[0]];
+            let command = this.commands[args[0].toLowerCase()];
 
             if (command) command.run(args.slice(1), sendMsg);
             else sendMsg("Invaild command, Check -help for all commands");
