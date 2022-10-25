@@ -26,6 +26,12 @@ function startChat(users)
       let lastTypingTime;
       let $currentInput = $inputMessage;
 
+      const jumpTo = (msgId) => {
+        console.log(msgId);
+        if (msgId === -1) return;
+        $($messages[0].parentElement).scrollToAnimate(`.message[data-msgid=${msgId}]`);
+      }
+
       const addParticipantsMessage = (data) => {
         let message = '';
         if (data.numUsers === 1) {
@@ -34,6 +40,7 @@ function startChat(users)
           message += `there's ${data.numUsers} users online`;
         }
         log(message);
+        // jumpTo(msgId);
       }
     
       // Sends a chat message
@@ -63,8 +70,11 @@ function startChat(users)
         addMessageElement($el, options);
       }
     
+      let chatLength = 0;
+
       //This clears the chat as you can probably guess...
       const clearChat = () => {
+        chatLength = 0; // Reset chat length
         return $messages.children().each((_, elem) => {
           $(elem).remove();
         });
@@ -78,20 +88,28 @@ function startChat(users)
           options.fade = false;
           $typingMessages.remove();
         }
+
+        //TODO: Find out why .data doesn't work (maybe I have the wrong version of jquery??)
+        //      /shrug probably not that but still I need to find out why this happens
     
-        const $usernameDiv = $('<span class="User" data-rank="'+ getRank(data) +'"/> ')
+        const $usernameDiv = $(`<span class="User" data-rank="${getRank(data)}"/> `)
           .text(data.Username + " ");
         const $messageBodyDiv = $('<span class="messageBody">')
           .text(data.message);
         
         if (data.UserId === 0) $messageBodyDiv.html($messageBodyDiv.html().replace(/\n/g,'<br/>'));
-    
+
         const typingClass = data.typing ? 'typing' : '';
-        const $messageDiv = $('<li class="message"/>')
-          .data('username', data.Username)
+        const $messageDiv = $(`<li class="message" data-msgid="${chatLength}"/>`)
+          // .data('username', data.Username)
           .addClass(typingClass)
           .append($usernameDiv, $messageBodyDiv);
-    
+        
+        if (!data.typing)
+        {
+          console.log($messageDiv.data("msgid"));
+          chatLength += 1;
+        }
         addMessageElement($messageDiv, options);
       }
     
@@ -100,7 +118,9 @@ function startChat(users)
         data.typing = true;
         data.message = 'is typing';
 
-        if (data.isGeneral ? currentRoom === "General" : currentRoom != "General") addChatMessage(data);
+        if (currentRoom === "General" && !data.isGeneral) return;
+
+        addChatMessage(data);
       }
     
       // Removes the visual chat typing message
@@ -132,11 +152,18 @@ function startChat(users)
         if (options.fade) {
           $el.hide().fadeIn(FADE_TIME);
         }
-        if (options.prepend) {
-          $messages.prepend($el);
-        } else {
-          $messages.append($el);
-        }
+
+        $messages.append($el);
+
+        // if (options.lastMsgId === -1)
+        // {
+        //   $messages.append($el);
+        // }
+        // else
+        // {
+        //   // jumpTo(options.lastMsgId);
+        //   $messages.append($el);
+        // }
     
         // $messages[0].scrollTop = $messages[0].scrollHeight;
       }
@@ -276,6 +303,7 @@ function startChat(users)
             addChatMessage(msgData);
           });
           addParticipantsMessage(roomData);
+          jumpTo(roomData.lastMessage);
         })();
       })
     
