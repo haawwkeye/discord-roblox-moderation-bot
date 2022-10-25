@@ -2,6 +2,34 @@
 //      This is very usefull as rn we can only do everything once the request is done instead of waiting
 //      for the request to be done before doing anything else
 
+$.fn.scrollTo = function(childSel, options)
+{
+    return this.scrollToAnimate(childSel, Infinity)
+};
+
+$.fn.scrollToAnimate = function(childSel, speed)
+{
+    if (!this.length) return this;
+
+    return this.each(function()
+    {
+        let parentEl = $(this);
+        let list = parentEl.find(childSel);
+
+        console.log(list);
+
+        if (list.length > 0)
+        {
+            let child = list[0];
+            parentEl.stop().animate({
+                scrollTop:  parentEl.scrollTop(
+                    parentEl.scrollTop() - parentEl.offset().top + child.offset().top - (parentEl.outerHeight() / 2) + (parentEl.outerHeight() / 2)
+                ) 
+            }, speed == undefined ? 1000 : speed);
+        }
+    });
+};
+
 const rankings = {
     [-1]: "Player",
     [0]: "VIP",
