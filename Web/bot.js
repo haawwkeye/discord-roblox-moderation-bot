@@ -33,7 +33,6 @@ exports.commands = {
                     if (Object.hasOwnProperty.call(cmds, i)) {
                         const cmd = cmds[i];
                         message += fetchHelp(cmd) + "\n";
-                        
                     }
                 }
             }
@@ -46,7 +45,7 @@ exports.commands = {
     },
     "dm": {
         run: (args, sendMsg) => {
-            let uid = args[0];
+            let uid = Number(args[0]);
             let msg;
 
             args.forEach((elem, i) => {
@@ -55,14 +54,16 @@ exports.commands = {
                 else msg += elem + " ";
             });
 
+            //TODO: Check to see IF the userId exists
             if (!uid) return sendMsg(`UserId is an required option.`);
             if (!msg) return sendMsg(`Message is an required option.`);
 
             msg.substring(0, msg.length-1);
 
             try {
+                //TODO: have sent message respond with the username instead of user
                 this.bot.sendPrivateMsg(msg, uid);
-                sendMsg(`Sent message to ${uid}`);
+                sendMsg(`Sent message to User`);
             } catch (e) {
                 sendMsg(`Failed to send message to ${uid}\n${e}`);
             }
