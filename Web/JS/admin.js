@@ -16,11 +16,15 @@ $.fn.scrollToAnimate = function(childSel, speed)
         let parentEl = $(this);
         let list = parentEl.find(childSel);
 
-        console.log(list);
-
         if (list.length > 0)
         {
-            let child = list[0];
+            let child = $(list[0]); // Select only one element to scroll to
+
+            console.log(child);
+
+            console.log(parentEl.scrollTop())
+            console.log(parentEl.scrollTop() - parentEl.offset().top + child.offset().top - (parentEl.outerHeight() / 2) + (parentEl.outerHeight() / 2));
+
             parentEl.stop().animate({
                 scrollTop:  parentEl.scrollTop(
                     parentEl.scrollTop() - parentEl.offset().top + child.offset().top - (parentEl.outerHeight() / 2) + (parentEl.outerHeight() / 2)

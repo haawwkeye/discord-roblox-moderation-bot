@@ -74,6 +74,7 @@ function startChat(users)
 
       //This clears the chat as you can probably guess...
       const clearChat = () => {
+        jumpTo(0); // Jump to the first message BEFORE clearing
         chatLength = 0; // Reset chat length
         return $messages.children().each((_, elem) => {
           $(elem).remove();
@@ -107,7 +108,7 @@ function startChat(users)
         
         if (!data.typing)
         {
-          console.log($messageDiv.data("msgid"));
+          // console.log($messageDiv.data("msgid"));
           chatLength += 1;
         }
         addMessageElement($messageDiv, options);
@@ -303,7 +304,7 @@ function startChat(users)
             addChatMessage(msgData);
           });
           addParticipantsMessage(roomData);
-          jumpTo(roomData.lastMessage);
+          jumpTo(roomData.lastMessage-1);
         })();
       })
     
