@@ -26,7 +26,7 @@ exports.Roblox = async() => {
 exports.Level = -1;
 
 exports.help = async() => {
-    let name = `**${__filename__} <title> <description>**`;
+    let name = `**${__filename} <title> <description>**`;
     let description = "Makes a global announcement to the players playing your game";
     return `${name} - ${description}\n`;
 }
