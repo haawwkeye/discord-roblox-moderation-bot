@@ -246,6 +246,8 @@ let listener = http.listen(process.env.PORT, () => {
 if (__DEBUG) return; // Just some stuff for debugging only the website 
                      // So I don't spam discord api Lol
 
+client.on("debug", console.debug)
+
 client.on('ready', async() => {
     console.log(`Logged into the Discord account - ${client.user.tag}`);
     client.commandList = commandList;
