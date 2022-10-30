@@ -1,3 +1,7 @@
+// TODO: Make this use ws (websocket) instead of socket.io
+//       mostly cause it (should) be easier to use compared to socket.io
+//       Tho I think it's abit too late to do that
+
 /**
  * @param {express.Application} app
  */
@@ -35,7 +39,8 @@ module.exports = async (app, http, sessionMiddleware, users) => {
     
     //TODO: When saving chat and all that ONLY save UserId and Message
     //      This way we don't have to deal with permissions being wrong (or a deleted user)
-    //TODO: Handle deleted users aswell as maybe adding an option to save to database???
+    //TODO: Handle deleted users
+    //TODO: Add database for chat system (maybe?) for now saving to file is fine
 
     if (!fs.existsSync(__dirname + "/data/")) fs.mkdirSync(__dirname + "/data/");
 
@@ -182,15 +187,6 @@ module.exports = async (app, http, sessionMiddleware, users) => {
             socket.join(roomId);
         });
 
-        //TODO: Fix being able to see messages anywhere when they're supposed to only show up
-        //      In the current Room
-        //      example: have two clients signed in have client 1 stay in any channel
-        //      Then have client 2 open another channel and send any message
-        //      This will then (even tho it's not supposed to) show that one message
-        //      to ALL clients if you leave and rejoin the channel you were just in (client 1)
-        //      The messages will be gone tho maybe it's an issue on the client side?
-        //      Or it's in issue on how I send message to the client /shrug
-
         //TODO: Use new message for both all and private messages maybe? just an idea
         //      Probably won't do this tho
 
@@ -286,10 +282,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 isGeneral: isGeneral
             }
 
-            if (isGeneral)
-            {
-                socket.broadcast.emit('typing', sent);
-            }
+            if (isGeneral) socket.broadcast.emit('typing', sent);
             else socket.to(currentRoom).emit('typing', sent)
         });
 
@@ -305,10 +298,7 @@ module.exports = async (app, http, sessionMiddleware, users) => {
                 isGeneral: isGeneral
             }
 
-            if (isGeneral)
-            {
-                socket.broadcast.emit('stop typing', sent);
-            }
+            if (isGeneral) socket.broadcast.emit('stop typing', sent);
             else socket.to(currentRoom).emit('stop typing', sent)
         });
 
