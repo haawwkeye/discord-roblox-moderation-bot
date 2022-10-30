@@ -103,7 +103,7 @@ exports.run = async(interaction, client) => {
 
             interaction.followUp({
                 content: `<@${user.id}>`,
-                embeds: [client.embedMaker(user, "Failure", "Command timed out (30s)")],
+                embeds: [client.embedMaker(user, "Failure", "Command timed out (30s)\nPlease try again later")],
                 ephemeral: true
             });
         }
