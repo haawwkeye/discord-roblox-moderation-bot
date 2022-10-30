@@ -94,14 +94,14 @@ function startChat(users)
         //      /shrug probably not that but still I need to find out why this happens
     
         const $usernameDiv = $(`<span class="User" data-rank="${getRank(data)}"/> `)
-          .text(data.Username + " ");
+          .text(`${data.Username} `);
         const $messageBodyDiv = $('<span class="messageBody">')
           .text(data.message);
         
         if (data.UserId === 0) $messageBodyDiv.html($messageBodyDiv.html().replace(/\n/g,'<br/>'));
 
         const typingClass = data.typing ? 'typing' : '';
-        const $messageDiv = $(`<li class="message" data-msgid="${chatLength}"/>`)
+        const $messageDiv = $(`<li class="message" data-userid="${data.UserId}" data-msgid="${chatLength}"/>`)
           // .data('username', data.Username)
           .addClass(typingClass)
           .append($usernameDiv, $messageBodyDiv);
@@ -119,7 +119,7 @@ function startChat(users)
         data.typing = true;
         data.message = 'is typing';
 
-        if (currentRoom === "General" && !data.isGeneral) return;
+        if (currentRoom != "General" && data.isGeneral) return;
 
         addChatMessage(data);
       }
@@ -197,7 +197,7 @@ function startChat(users)
       // Gets the 'X is typing' messages of a user
       const getTypingMessages = (data) => {
         return $('.typing.message').filter(function (i) {
-          return $(this).data('username') === data.Username;
+          return $(this).data('userid') === data.UserId;
         });
       }
 
@@ -213,6 +213,13 @@ function startChat(users)
       let chatTabs = $("#tabs");
       let tabs = chatTabs.children();
       let $currentTab;
+
+      function hasTab(name)
+      {
+        return $('.tab').filter(function (i) {
+          return $(this).data('room') === name;
+        });
+      }
 
       let onTabClicked = (elem) => {
         let tab = $(elem);
@@ -310,16 +317,16 @@ function startChat(users)
     
       // Whenever the server emits 'new message', update the chat body
       socket.on('new message', (data) => {
-        addChatMessage(data);
+        if (currentRoom == "General") addChatMessage(data);
       });
 
       socket.on('private message', (data) => {
-        addChatMessage(data);
+        if (currentRoom != "General") addChatMessage(data);
       })
     
       // Whenever the server emits 'user joined', log it in the chat body
       socket.on('user joined', (data) => {
-        createTab(data);
+        if (!hasTab(data.UserId)) createTab(data);
         log(`${data.Username} joined`);
         addParticipantsMessage(data);
       });

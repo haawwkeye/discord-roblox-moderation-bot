@@ -185,8 +185,15 @@
 }
 
 #chatTabs {
+    overflow-y: hidden;
+    overflow-x: scroll;
+
     height: 40px;
     width: 100%;
+}
+
+#chatTabs::-webkit-scrollbar {
+    height: 0;
 }
 
 #tabs {
