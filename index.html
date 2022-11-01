@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Home Page</title>
+        <script src="/js/jquery.min.js"></script>
+        <!--
+            Embed css cause I'm too lazy Lol
+        -->
+        <style>
+            * {
+                color-scheme: dark;
+            }
+
+            .alert {
+                padding: 20px;
+                background-color: #f44336;
+                color: white;
+                opacity: 0;
+                transform: scale(0);
+                transition: 0.6s;
+                margin-bottom: 15px;
+            }
+
+            .alert.success {background-color: #04AA6D;}
+            .alert.info {background-color: #2196F3;}
+            .alert.warning {background-color: #ff9800;}
+
+            .alert .closebtn {
+                margin-left: 15px;
+                color: white;
+                font-weight: bold;
+                float: right;
+                font-size: 22px;
+                line-height: 20px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            .alert .closebtn:hover {
+                color: black;
+            }
+        </style>
+        <script>
+            const escapeHtml = (unsafe) => {
+                if (typeof(unsafe) != "string") return "";
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function makeAlertHtml(alertType, message) {
+                let alert;
+                switch (alertType) {
+                    case 1:
+                        alert = "Info";
+                        break;
+                    case 2:
+                        alert = "Success";
+                        break;
+                    case 3:
+                        alert = "Warning";
+                        break;
+                    case 4:
+                        alert = "Error";
+                        break;
+                    default:
+                        alert = "Error";
+                        break;
+                }
+
+                return `<div class="alert ${alert.toLowerCase()}">\n
+                    \t<span class="closebtn" onclick="
+                        var div = this.parentElement;
+                        div.style.opacity = '0';
+                        div.style.transform = 'scale(0)';
+                        setTimeout(function(){ div.style.display = 'none'; div.remove(); }, 605);
+                    ">&times;</span>\n
+                    \t<strong>${alert}!</strong> ${escapeHtml(message)}\n
+                </div>`
+            }
+
+            function alert(type, msg) {
+                let alerts = $("#Alerts"); // get the div
+                let html = makeAlertHtml(type, msg);
+                alerts.append(html);
+                let current = $("#Alerts")[0].lastElementChild;
+                setTimeout(() => {
+                    current.style.opacity = "1";
+                    current.style.transform = "scale(1)";
+                }, 100);
+            }
+
+            // We want to wait for everything to load before attempting to do any of this since this script is probably at the top of body
+            document.addEventListener("DOMContentLoaded", async () => {
+                try {
+                    function botData(data)
+                    {
+                        let body = data.responseText != "Internal Server Error" ? data.responseText : "Unknown";
+                        $("#botstatus").text(body);
+                    }
+                    async function getBotData()
+                    {
+                        await $.ajax({
+                            type: "get",
+                            url: "/bot",
+                            
+                        })
+                        .then(botData)
+                        .catch(botData);
+                    }
+                    await getBotData();
+                } catch (error) {
+                    if (typeof(error) == "object" && error.responseText)
+                    {
+                        alert(4, error.responseText)
+                    }
+                    else alert(4, error);
+                    
+                    console.error(error);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <noscript>
+            <strong style="font-size: x-large;">We're sorry but this application doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        </noscript>
+        <h1>Home</h1>
+        <hr>
+        <!--
+            This is for alerts but mainly for command responses
+            When we send a command we wait for a response if it times out we send an "error"
+            Something like: "Error: CommandName Timed out"
+            This will also allow for more then one response since we can append it
+            and we can just have a script handle the backend of things like how long it's there etc
+            Should be easy to do Plus I can always add an api to auto generate the html
+            then it will insert that ofc I will escape the html I'm not that dumb
+        -->
+        <div id="Alerts"></div>
+        <div id="Home">
+            <a style="font-size: x-large;" href="/login">Admin Login</a>
+            <br>
+            <br>
+            <strong style="font-size: x-large;">Status: <a style="font-size: x-large;" id="botstatus">Unknown</a></strong>
+        </div>
+    </body>
+</html>
