@@ -170,8 +170,63 @@ client.embedMaker = (author, title, description) => {
 
 //#region Express
 
+app.all("/bot", (req, res) => {
+    let status = client.ws.status;
+
+    let code, text;
+
+    switch (status) {
+        case 0:
+            code = 200;
+            text = "Ready";
+            break;
+        case 1:
+            code = 425;
+            text = "Connecting";
+            break;
+        case 2:
+            code = 503;
+            text = "Reconnecting";
+            break;
+        case 3:
+            code = 503;
+            text = "Idle";
+            break;
+        case 4:
+            code = 425;
+            text = "Nearly";
+            break;
+        case 5:
+            code = 503;
+            text = "Disconnected";
+            break;
+        case 6:
+            code = 425;
+            text = "WaitingForGuilds";
+            break;
+        case 7:
+            code = 425;
+            text = "Identifying";
+            break;
+        case 8:
+            code = 200;
+            text = "Resuming";
+            break;
+        default:
+            code = 500;
+            text = "Internal Server Error";
+            break;
+    }
+
+    res.status(code).json({
+        status: text,
+        ping: client.ws.ping
+    })
+});
+
 app.get('/', async (req, res) => {
-     res.sendStatus(200);
+    if (convertToBool(process.env.enableAdminWebsite)) res.sendFile(path.join(__dirname,  "index.html"));
+    else res.sendStatus(200);
 });
 
 app.get(`/get-request`, async (req, res) => {
