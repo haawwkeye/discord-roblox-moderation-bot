@@ -100,15 +100,23 @@
                 try {
                     function botData(data)
                     {
-                        let body = data.responseText != "Internal Server Error" ? data.responseText : "Unknown";
-                        $("#botstatus").text(body);
+                        try
+                        {
+                            let body = data.responseText != "Internal Server Error" ? JSON.parse(data.responseText) : "Unknown";
+                            if (data.status === 404) return alert(4, "Cannot GET /bot");
+                            $("#botstatus").text(body.status);
+                        } catch (e) {
+                            alert(4, "Invaild data sent from /bot\nCheck console for more details");
+                            console.log(data.responseText);
+                            console.error(e);
+                        }
                     }
+
                     async function getBotData()
                     {
                         await $.ajax({
                             type: "get",
-                            url: "/bot",
-                            
+                            url: "/bot"
                         })
                         .then(botData)
                         .catch(botData);
@@ -146,7 +154,7 @@
             <a style="font-size: x-large;" href="/login">Admin Login</a>
             <br>
             <br>
-            <strong style="font-size: x-large;">Status: <a style="font-size: x-large;" id="botstatus">Unknown</a></strong>
+            <strong style="font-size: x-large;">Status: <a style="font-size: x-large;" id="botstatus">N/A</a></strong>
         </div>
     </body>
 </html>
