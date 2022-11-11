@@ -325,7 +325,14 @@ module.exports = (app, http) => {
                     if (users[username]) return res.status(403).send(`${username} is already signed in<br>Try again later`)
 
                     users[username] = req.sessionID; // SID instead since req.session doesn't work in this case
+                    usersInfo[1] = {
+                        UserId: 1,
+                        Username: username,
+                        PermissionLevel: userInfo.permissionLevel,
+                        IsAdmin: false
+                    }
                     req.session.LoggedIn = true;
+                    req.session.UserId = 1;
                     req.session.Username = username;
                     req.session.PermissionLevel = userInfo.permissionLevel;
                     req.session.IsAdmin = false;
