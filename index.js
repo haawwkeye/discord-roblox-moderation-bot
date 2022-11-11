@@ -218,8 +218,9 @@ app.all("/bot", (req, res) => {
             break;
     }
 
-    res.status(code).json({
+    res.status(200).json({
         status: text,
+        statusCode: code,
         ping: client.ws.ping
     })
 });

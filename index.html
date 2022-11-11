@@ -104,9 +104,11 @@
                     {
                         try
                         {
-                            let body = data != "Internal Server Error" ? data : "Unknown";
                             if (data.status === 404) return alert(4, "Cannot GET /bot");
-                            $("#botstatus").text(`${body.status} : ${body.ping}ms`);
+                            if (data.status === null) data.status = "Internal Server Error";
+                            if (data.ping === null) data.ping = "N/A";
+                            
+                            $("#botstatus").text(`${data.status} : ${data.ping} ms`);
                         } catch (e) {
                             alert(4, "Invaild data sent from /bot\nCheck console for more details");
                             console.log(data);
@@ -124,7 +126,7 @@
                         .catch(botData);
                     }
 
-                    botDataInt = setInterval(getBotData, 1000);
+                    botDataInt = setInterval(getBotData, 5000);
                     
                     await getBotData();
                 } catch (error) {
