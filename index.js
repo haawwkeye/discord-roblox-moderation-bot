@@ -1,6 +1,6 @@
 const args = process.argv.slice(2);
 
-require("better-logging")(console);
+// require("better-logging")(console);
 require('dotenv').config();
 
 const commandModule = require("./modules/commands");
