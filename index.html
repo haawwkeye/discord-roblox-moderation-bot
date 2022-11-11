@@ -102,12 +102,12 @@
                     {
                         try
                         {
-                            let body = data.responseText != "Internal Server Error" ? JSON.parse(data.responseText) : "Unknown";
+                            let body = data != "Internal Server Error" ? data : "Unknown";
                             if (data.status === 404) return alert(4, "Cannot GET /bot");
                             $("#botstatus").text(body.status);
                         } catch (e) {
                             alert(4, "Invaild data sent from /bot\nCheck console for more details");
-                            console.log(data.responseText);
+                            console.log(data);
                             console.error(e);
                         }
                     }
