@@ -97,6 +97,8 @@
 
             // We want to wait for everything to load before attempting to do any of this since this script is probably at the top of body
             document.addEventListener("DOMContentLoaded", async () => {
+                let botDataInt;
+
                 try {
                     function botData(data)
                     {
@@ -121,9 +123,13 @@
                         .then(botData)
                         .catch(botData);
                     }
-                    setInterval(getBotData, 1000);
+
+                    botDataInt = setInterval(getBotData, 1000);
+                    
                     await getBotData();
                 } catch (error) {
+                    clearInterval(botDataInt);
+                    
                     if (typeof(error) == "object" && error.responseText)
                     {
                         alert(4, error.responseText)
