@@ -151,7 +151,8 @@ module.exports = (app, http) => {
                 {
                     if (error.fatal) fatal = true;
                     console.error(error);
-                    res.status(500).send("Database Error<br>Please try again later.");
+                    res.status(500).send(`${fatal && "Fatal " || ""}Database Error<br>
+                    ${fatal && "Check server logs for more details" || "Please try again later."}`);
                     return;
                 }
 
@@ -175,7 +176,8 @@ module.exports = (app, http) => {
                         {
                             if (error.fatal) fatal = true;
                             console.error(error);
-                            res.status(500).send("Database Error<br>Please try again later.");
+                            res.status(500).send(`${fatal && "Fatal " || ""}Database Error<br>
+                    ${fatal && "Check server logs for more details" || "Please try again later."}`);
                             return;
                         }
                         
@@ -211,7 +213,8 @@ module.exports = (app, http) => {
                     {
                         if (error.fatal) fatal = true;
                         console.error(error);
-                        res.status(500).send("Database Error<br>Please try again later.");
+                        res.status(500).send(`${fatal && "Fatal " || ""}Database Error<br>
+                    ${fatal && "Check server logs for more details" || "Please try again later."}`);
                         return;
                     }
 
@@ -267,7 +270,8 @@ module.exports = (app, http) => {
                 {
                     if (error.fatal) fatal = true;
                     console.error(error);
-                    res.status(500).send("Database Error<br>Please try again later.");
+                    res.status(500).send(`${fatal && "Fatal " || ""}Database Error<br>
+                    ${fatal && "Check server logs for more details" || "Please try again later."}`);
                     return;
                 }
                 // If the account exists
