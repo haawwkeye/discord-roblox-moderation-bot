@@ -17,7 +17,7 @@
     "memorystore": "^1.6.7",
     "mysql": "^2.18.1",
     "path": "^0.12.7",
-    "socket.io": "^4.5.3",
+    "socket.io": "^4.6.0",
     "socket.io-client": "^4.5.3",
     "then-fs": "^2.0.0"
   },
